@@ -278,6 +278,70 @@
             cursor: not-allowed;
         }
 
+        .camera-container {
+            position: relative;
+            border-radius: 12px;
+            overflow: hidden;
+            background: rgba(0,0,0,0.4);
+            border: 1px solid rgba(212, 165, 116, 0.3);
+        }
+
+        .camera-container video {
+            width: 100%;
+            display: block;
+            border-radius: 12px;
+            transform: scaleX(-1); /* Mirror effect for selfie camera */
+        }
+
+        .camera-controls {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 1rem;
+        }
+
+        .camera-btn {
+            flex: 1;
+            padding: 0.8rem 1rem;
+            font-family: 'Outfit', sans-serif;
+            font-size: 0.95rem;
+            font-weight: 500;
+            color: var(--cream);
+            background: linear-gradient(135deg, rgba(61, 35, 20, 0.8), rgba(26, 15, 10, 0.9));
+            border: 1px solid rgba(212, 165, 116, 0.4);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .camera-btn:hover:not(:disabled) {
+            border-color: var(--gold);
+            background: rgba(201, 162, 39, 0.15);
+        }
+
+        .camera-btn:disabled {
+            opacity: 0.4;
+            cursor: not-allowed;
+        }
+
+        .camera-btn.capture {
+            background: linear-gradient(135deg, var(--gold), var(--sand));
+            color: var(--deep-brown);
+            border: none;
+        }
+
+        .camera-btn.capture:hover:not(:disabled) {
+            box-shadow: 0 4px 15px rgba(201, 162, 39, 0.3);
+        }
+
+        .camera-btn.retake {
+            background: linear-gradient(135deg, var(--terracotta), #a04830);
+            border: none;
+        }
+
+        .camera-btn.retake:hover {
+            box-shadow: 0 4px 15px rgba(196, 92, 62, 0.3);
+        }
+
         @media (max-width: 768px) {
             .container {
                 grid-template-columns: 1fr;
@@ -297,13 +361,18 @@
 
     <div class="container">
         <div class="panel">
-            <h2 class="panel-title">Upload Your Image</h2>
+            <h2 class="panel-title">Capture Your Image</h2>
             
-            <div class="upload-zone" id="uploadZone">
-                <div class="upload-icon">🏺</div>
-                <p class="upload-text">Drop your image here or click to browse</p>
+            <div class="camera-container" id="cameraContainer">
+                <video id="videoFeed" autoplay playsinline></video>
+                <canvas id="captureCanvas" style="display: none;"></canvas>
             </div>
-            <input type="file" id="fileInput" accept="image/*">
+            
+            <div class="camera-controls">
+                <button class="camera-btn" id="startCameraBtn">📷 Start Camera</button>
+                <button class="camera-btn capture" id="captureBtn" disabled>�� Take Photo</button>
+                <button class="camera-btn retake" id="retakeBtn" style="display: none;">🔄 Retake</button>
+            </div>
             
             <div class="preview-container" id="previewContainer">
                 <img id="previewImage" src="" alt="Preview">
@@ -334,8 +403,12 @@
     </div>
 
     <script>
-        const uploadZone = document.getElementById('uploadZone');
-        const fileInput = document.getElementById('fileInput');
+        const cameraContainer = document.getElementById('cameraContainer');
+        const videoFeed = document.getElementById('videoFeed');
+        const captureCanvas = document.getElementById('captureCanvas');
+        const startCameraBtn = document.getElementById('startCameraBtn');
+        const captureBtn = document.getElementById('captureBtn');
+        const retakeBtn = document.getElementById('retakeBtn');
         const previewContainer = document.getElementById('previewContainer');
         const previewImage = document.getElementById('previewImage');
         const generateBtn = document.getElementById('generateBtn');
@@ -345,68 +418,74 @@
         const errorMsg = document.getElementById('errorMsg');
         const printBtn = document.getElementById('printBtn');
 
-        let selectedFile = null;
         let imageBase64 = null;
-        let generatedImageBase64 = null;  // Store the generated image
+        let generatedImageBase64 = null;
+        let stream = null;
 
-        // Click to upload
-        uploadZone.addEventListener('click', () => fileInput.click());
-
-        // Drag and drop
-        uploadZone.addEventListener('dragover', (e) => {
-            e.preventDefault();
-            uploadZone.classList.add('dragover');
-        });
-
-        uploadZone.addEventListener('dragleave', () => {
-            uploadZone.classList.remove('dragover');
-        });
-
-        uploadZone.addEventListener('drop', (e) => {
-            e.preventDefault();
-            uploadZone.classList.remove('dragover');
-            const files = e.dataTransfer.files;
-            if (files.length > 0) {
-                handleFile(files[0]);
-            }
-        });
-
-        fileInput.addEventListener('change', (e) => {
-            if (e.target.files.length > 0) {
-                handleFile(e.target.files[0]);
-            }
-        });
-
-        function handleFile(file) {
-            if (!file.type.startsWith('image/')) {
-                showError('Please select an image file');
-                return;
-            }
-
-            selectedFile = file;
-            const reader = new FileReader();
-            
-            reader.onload = (e) => {
-                imageBase64 = e.target.result;
-                previewImage.src = imageBase64;
-                previewContainer.classList.add('active');
-                generateBtn.disabled = false;
+        // Start camera
+        startCameraBtn.addEventListener('click', async () => {
+            try {
+                stream = await navigator.mediaDevices.getUserMedia({ 
+                    video: { 
+                        width: { ideal: 1280 },
+                        height: { ideal: 720 },
+                        facingMode: 'user' // Use front camera
+                    } 
+                });
+                videoFeed.srcObject = stream;
+                startCameraBtn.style.display = 'none';
+                captureBtn.disabled = false;
                 hideError();
-            };
-            
-            reader.readAsDataURL(file);
-        }
+            } catch (err) {
+                showError('Unable to access camera: ' + err.message);
+            }
+        });
 
+        // Capture photo
+        captureBtn.addEventListener('click', () => {
+            // Set canvas size to match video
+            captureCanvas.width = videoFeed.videoWidth;
+            captureCanvas.height = videoFeed.videoHeight;
+            
+            const ctx = captureCanvas.getContext('2d');
+            
+            // Mirror the image to match the video preview
+            ctx.translate(captureCanvas.width, 0);
+            ctx.scale(-1, 1);
+            ctx.drawImage(videoFeed, 0, 0);
+            
+            // Convert to base64
+            imageBase64 = captureCanvas.toDataURL('image/png');
+            previewImage.src = imageBase64;
+            
+            // Update UI
+            previewContainer.classList.add('active');
+            videoFeed.style.display = 'none';
+            captureBtn.style.display = 'none';
+            retakeBtn.style.display = 'block';
+            generateBtn.disabled = false;
+        });
+
+        // Retake photo
+        retakeBtn.addEventListener('click', () => {
+            imageBase64 = null;
+            previewContainer.classList.remove('active');
+            videoFeed.style.display = 'block';
+            captureBtn.style.display = 'block';
+            retakeBtn.style.display = 'none';
+            generateBtn.disabled = true;
+        });
+
+        // Generate image
         generateBtn.addEventListener('click', async () => {
             if (!imageBase64) return;
 
             generateBtn.disabled = true;
             loading.classList.add('active');
             placeholder.style.display = 'none';
-            printBtn.classList.remove('active');  // Hide print button while generating
+            printBtn.classList.remove('active');
             hideError();
 
-            // Remove existing result image if any
             const existingImg = resultContainer.querySelector('img');
             if (existingImg) existingImg.remove();
 
@@ -428,7 +507,6 @@
                 const data = await response.json();
                 
                 if (data.image) {
-                    // Store the generated image base64
                     generatedImageBase64 = data.image.startsWith('data:') 
                         ? data.image 
                         : `data:image/png;base64,${data.image}`;
@@ -438,7 +516,6 @@
                     resultContainer.classList.add('has-image');
                     resultContainer.appendChild(resultImg);
                     
-                    // Show the print button
                     printBtn.classList.add('active');
                 } else {
                     throw new Error('No image in response');
@@ -452,7 +529,7 @@
             }
         });
 
-        // Print button click handler
+        // Print button handler
         printBtn.addEventListener('click', async () => {
             if (!generatedImageBase64) return;
 
@@ -460,7 +537,6 @@
             printBtn.textContent = '🖨️ Sending to printer...';
 
             try {
-                // Convert base64 to Blob
                 const base64Data = generatedImageBase64.split(',')[1];
                 const byteCharacters = atob(base64Data);
                 const byteNumbers = new Array(byteCharacters.length);
@@ -470,7 +546,6 @@
                 const byteArray = new Uint8Array(byteNumbers);
                 const blob = new Blob([byteArray], { type: 'image/png' });
 
-                // Create FormData and append the file
                 const formData = new FormData();
                 formData.append('file', blob, 'generated_image.png');
 
@@ -506,6 +581,13 @@
         function hideError() {
             errorMsg.classList.remove('active');
         }
+
+        // Stop camera when page is closed
+        window.addEventListener('beforeunload', () => {
+            if (stream) {
+                stream.getTracks().forEach(track => track.stop());
+            }
+        });
     </script>
 </body>
 </html>
