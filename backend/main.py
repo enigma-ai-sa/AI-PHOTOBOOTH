@@ -1,6 +1,6 @@
 from google import genai
 from google.genai import types
-from PIL import Image
+from PIL import Image, ImageWin
 import time
 from dotenv import load_dotenv
 import os
