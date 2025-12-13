@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>عام الحرف اليدوية | Image Generator</title>
+    <link href="https://fonts.googleapis.com/css2?family=Amiri:wght@400;700&family=Outfit:wght@300;500;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --sand: #d4a574;
+            --terracotta: #c45c3e;
+            --deep-brown: #3d2314;
+            --cream: #f5efe6;
+            --gold: #c9a227;
+        }
+
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: 'Outfit', sans-serif;
+            min-height: 100vh;
+            background: 
+                radial-gradient(ellipse at 20% 80%, rgba(196, 92, 62, 0.15) 0%, transparent 50%),
+                radial-gradient(ellipse at 80% 20%, rgba(201, 162, 39, 0.1) 0%, transparent 50%),
+                linear-gradient(135deg, var(--deep-brown) 0%, #2a1810 50%, #1a0f0a 100%);
+            color: var(--cream);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 2rem;
+        }
+
+        header {
+            text-align: center;
+            margin-bottom: 3rem;
+            animation: fadeDown 0.8s ease-out;
+        }
+
+        @keyframes fadeDown {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        h1 {
+            font-family: 'Amiri', serif;
+            font-size: 3rem;
+            color: var(--gold);
+            text-shadow: 0 2px 20px rgba(201, 162, 39, 0.3);
+            margin-bottom: 0.5rem;
+        }
+
+        .subtitle {
+            font-weight: 300;
+            color: var(--sand);
+            letter-spacing: 0.3em;
+            text-transform: uppercase;
+            font-size: 0.85rem;
+        }
+
+        .container {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            max-width: 1000px;
+            width: 100%;
+            animation: fadeUp 0.8s ease-out 0.2s both;
+        }
+
+        @keyframes fadeUp {
+            from { opacity: 0; transform: translateY(30px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .panel {
+            background: linear-gradient(145deg, rgba(61, 35, 20, 0.6), rgba(26, 15, 10, 0.8));
+            border: 1px solid rgba(212, 165, 116, 0.2);
+            border-radius: 16px;
+            padding: 2rem;
+            backdrop-filter: blur(10px);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .panel::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 3px;
+            background: linear-gradient(90deg, transparent, var(--gold), transparent);
+        }
+
+        .panel-title {
+            font-family: 'Amiri', serif;
+            font-size: 1.4rem;
+            color: var(--sand);
+            margin-bottom: 1.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .panel-title::before {
+            content: '◆';
+            color: var(--terracotta);
+            font-size: 0.8rem;
+        }
+
+        .upload-zone {
+            border: 2px dashed rgba(212, 165, 116, 0.4);
+            border-radius: 12px;
+            padding: 3rem 2rem;
+            text-align: center;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            background: rgba(0,0,0,0.2);
+        }
+
+        .upload-zone:hover {
+            border-color: var(--gold);
+            background: rgba(201, 162, 39, 0.05);
+        }
+
+        .upload-zone.dragover {
+            border-color: var(--terracotta);
+            background: rgba(196, 92, 62, 0.1);
+        }
+
+        .upload-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+
+        .upload-text {
+            color: var(--sand);
+            font-weight: 300;
+        }
+
+        #fileInput {
+            display: none;
+        }
+
+        .preview-container {
+            margin-top: 1.5rem;
+            display: none;
+        }
+
+        .preview-container.active {
+            display: block;
+        }
+
+        .preview-container img,
+        .result-container img {
+            width: 100%;
+            border-radius: 8px;
+            border: 1px solid rgba(212, 165, 116, 0.3);
+        }
+
+        .result-container {
+            min-height: 200px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: rgba(0,0,0,0.2);
+            border-radius: 12px;
+            border: 1px solid rgba(212, 165, 116, 0.1);
+        }
+
+        .result-container.has-image {
+            background: none;
+            border: none;
+        }
+
+        .placeholder-text {
+            color: rgba(212, 165, 116, 0.4);
+            font-style: italic;
+        }
+
+        .generate-btn {
+            width: 100%;
+            margin-top: 1.5rem;
+            padding: 1rem 2rem;
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.1rem;
+            font-weight: 500;
+            color: var(--deep-brown);
+            background: linear-gradient(135deg, var(--gold), var(--sand));
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+        }
+
+        .generate-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(201, 162, 39, 0.3);
+        }
+
+        .generate-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        .loading {
+            display: none;
+            align-items: center;
+            justify-content: center;
+            gap: 0.5rem;
+            color: var(--sand);
+        }
+
+        .loading.active {
+            display: flex;
+        }
+
+        .spinner {
+            width: 24px;
+            height: 24px;
+            border: 3px solid rgba(212, 165, 116, 0.2);
+            border-top-color: var(--gold);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .error-msg {
+            color: var(--terracotta);
+            margin-top: 1rem;
+            padding: 1rem;
+            background: rgba(196, 92, 62, 0.1);
+            border-radius: 8px;
+            display: none;
+        }
+
+        .error-msg.active {
+            display: block;
+        }
+
+        .print-btn {
+            width: 100%;
+            margin-top: 1rem;
+            padding: 1rem 2rem;
+            font-family: 'Outfit', sans-serif;
+            font-size: 1.1rem;
+            font-weight: 500;
+            color: var(--cream);
+            background: linear-gradient(135deg, var(--terracotta), #a04830);
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            text-transform: uppercase;
+            letter-spacing: 0.1em;
+            display: none;
+        }
+
+        .print-btn.active {
+            display: block;
+        }
+
+        .print-btn:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 8px 25px rgba(196, 92, 62, 0.4);
+        }
+
+        .print-btn:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+
+        @media (max-width: 768px) {
+            .container {
+                grid-template-columns: 1fr;
+            }
+            
+            h1 {
+                font-size: 2rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>عام الحرف اليدوية</h1>
+        <p class="subtitle">Year of Handicrafts</p>
+    </header>
+
+    <div class="container">
+        <div class="panel">
+            <h2 class="panel-title">Upload Your Image</h2>
+            
+            <div class="upload-zone" id="uploadZone">
+                <div class="upload-icon">🏺</div>
+                <p class="upload-text">Drop your image here or click to browse</p>
+            </div>
+            <input type="file" id="fileInput" accept="image/*">
+            
+            <div class="preview-container" id="previewContainer">
+                <img id="previewImage" src="" alt="Preview">
+            </div>
+            
+            <button class="generate-btn" id="generateBtn" disabled>
+                Generate Pottery Scene
+            </button>
+            
+            <div class="error-msg" id="errorMsg"></div>
+        </div>
+
+        <div class="panel">
+            <h2 class="panel-title">Generated Result</h2>
+            
+            <div class="result-container" id="resultContainer">
+                <div class="loading" id="loading">
+                    <div class="spinner"></div>
+                    <span>Creating your artwork...</span>
+                </div>
+                <p class="placeholder-text" id="placeholder">Your generated image will appear here</p>
+            </div>
+            
+            <button class="print-btn" id="printBtn">
+                🖨️ Print Image
+            </button>
+        </div>
+    </div>
+
+    <script>
+        const uploadZone = document.getElementById('uploadZone');
+        const fileInput = document.getElementById('fileInput');
+        const previewContainer = document.getElementById('previewContainer');
+        const previewImage = document.getElementById('previewImage');
+        const generateBtn = document.getElementById('generateBtn');
+        const resultContainer = document.getElementById('resultContainer');
+        const loading = document.getElementById('loading');
+        const placeholder = document.getElementById('placeholder');
+        const errorMsg = document.getElementById('errorMsg');
+        const printBtn = document.getElementById('printBtn');
+
+        let selectedFile = null;
+        let imageBase64 = null;
+        let generatedImageBase64 = null;  // Store the generated image
+
+        // Click to upload
+        uploadZone.addEventListener('click', () => fileInput.click());
+
+        // Drag and drop
+        uploadZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadZone.classList.add('dragover');
+        });
+
+        uploadZone.addEventListener('dragleave', () => {
+            uploadZone.classList.remove('dragover');
+        });
+
+        uploadZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadZone.classList.remove('dragover');
+            const files = e.dataTransfer.files;
+            if (files.length > 0) {
+                handleFile(files[0]);
+            }
+        });
+
+        fileInput.addEventListener('change', (e) => {
+            if (e.target.files.length > 0) {
+                handleFile(e.target.files[0]);
+            }
+        });
+
+        function handleFile(file) {
+            if (!file.type.startsWith('image/')) {
+                showError('Please select an image file');
+                return;
+            }
+
+            selectedFile = file;
+            const reader = new FileReader();
+            
+            reader.onload = (e) => {
+                imageBase64 = e.target.result;
+                previewImage.src = imageBase64;
+                previewContainer.classList.add('active');
+                generateBtn.disabled = false;
+                hideError();
+            };
+            
+            reader.readAsDataURL(file);
+        }
+
+        generateBtn.addEventListener('click', async () => {
+            if (!imageBase64) return;
+
+            generateBtn.disabled = true;
+            loading.classList.add('active');
+            placeholder.style.display = 'none';
+            printBtn.classList.remove('active');  // Hide print button while generating
+            hideError();
+
+            // Remove existing result image if any
+            const existingImg = resultContainer.querySelector('img');
+            if (existingImg) existingImg.remove();
+
+            try {
+                const response = await fetch('http://127.0.0.1:5000/image-generator-1', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify({
+                        image: imageBase64
+                    })
+                });
+
+                if (!response.ok) {
+                    throw new Error(`Server error: ${response.status}`);
+                }
+
+                const data = await response.json();
+                
+                if (data.image) {
+                    // Store the generated image base64
+                    generatedImageBase64 = data.image.startsWith('data:') 
+                        ? data.image 
+                        : `data:image/png;base64,${data.image}`;
+                    
+                    const resultImg = document.createElement('img');
+                    resultImg.src = generatedImageBase64;
+                    resultContainer.classList.add('has-image');
+                    resultContainer.appendChild(resultImg);
+                    
+                    // Show the print button
+                    printBtn.classList.add('active');
+                } else {
+                    throw new Error('No image in response');
+                }
+            } catch (error) {
+                showError(`Error: ${error.message}`);
+                placeholder.style.display = 'block';
+            } finally {
+                loading.classList.remove('active');
+                generateBtn.disabled = false;
+            }
+        });
+
+        // Print button click handler
+        printBtn.addEventListener('click', async () => {
+            if (!generatedImageBase64) return;
+
+            printBtn.disabled = true;
+            printBtn.textContent = '🖨️ Sending to printer...';
+
+            try {
+                // Convert base64 to Blob
+                const base64Data = generatedImageBase64.split(',')[1];
+                const byteCharacters = atob(base64Data);
+                const byteNumbers = new Array(byteCharacters.length);
+                for (let i = 0; i < byteCharacters.length; i++) {
+                    byteNumbers[i] = byteCharacters.charCodeAt(i);
+                }
+                const byteArray = new Uint8Array(byteNumbers);
+                const blob = new Blob([byteArray], { type: 'image/png' });
+
+                // Create FormData and append the file
+                const formData = new FormData();
+                formData.append('file', blob, 'generated_image.png');
+
+                const response = await fetch('http://127.0.0.1:5000/print', {
+                    method: 'POST',
+                    body: formData
+                });
+
+                const data = await response.json();
+
+                if (!response.ok) {
+                    throw new Error(data.error || 'Print failed');
+                }
+
+                printBtn.textContent = '✓ Sent to printer!';
+                setTimeout(() => {
+                    printBtn.textContent = '🖨️ Print Image';
+                }, 3000);
+
+            } catch (error) {
+                showError(`Print error: ${error.message}`);
+                printBtn.textContent = '🖨️ Print Image';
+            } finally {
+                printBtn.disabled = false;
+            }
+        });
+
+        function showError(message) {
+            errorMsg.textContent = message;
+            errorMsg.classList.add('active');
+        }
+
+        function hideError() {
+            errorMsg.classList.remove('active');
+        }
+    </script>
+</body>
+</html>
