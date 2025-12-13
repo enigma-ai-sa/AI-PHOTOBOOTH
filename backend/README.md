@@ -7,7 +7,7 @@
 4. INSTALL requirements.txt
     - pip install -r requirements.txt
 5. SET UP THE ENVIROMENTS (.env file):
-    - GOOGLE_API_KEY=xxx
+    - GEMINI_API_KEY=xxx
 6. RUN BACKEND
     - python main.py
 
