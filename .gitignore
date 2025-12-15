@@ -1,3 +1,26 @@
+# Python virtual environment
 .venv/
 .venv
+
+# Environment variables
 .env
+
+# engima-photobooth (Next.js)
+engima-photobooth/node_modules/
+engima-photobooth/.next/
+engima-photobooth/out/
+engima-photobooth/build/
+engima-photobooth/tsconfig.tsbuildinfo
+engima-photobooth/.env.local
+engima-photobooth/.env.development.local
+engima-photobooth/.env.production.local
+engima-photobooth/.env.test.local
+
+# System files
+.DS_Store
+
+# IDE/Editor
+engima-photobooth/.vscode/
+engima-photobooth/.idea/
+engima-photobooth/*.swp
+engima-photobooth/*.swo
