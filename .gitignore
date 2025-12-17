@@ -1,9 +1,6 @@
-# Python virtual environment
-.venv/
-.venv
-
 # Environment variables
 .env
+./.env
 
 # engima-photobooth (Next.js)
 engima-photobooth/node_modules/

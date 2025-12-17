@@ -8,8 +8,8 @@ from flask import Flask, request, jsonify
 from flask_cors import CORS
 import base64
 from io import BytesIO
-# import win32print
-# import win32ui
+import win32print
+import win32ui
 
 load_dotenv()
 
@@ -24,20 +24,211 @@ app = Flask(__name__)
 CORS(app)
 
 # THE ENDPOINTS FOR IMAGE GENERATION
-@app.route('/image-generator-1', methods=['POST'])
-def generate_image_route():
+@app.route('/image-generator-pottery', methods=['POST'])
+def generate_image_pottery_route():
     data = request.json
     image_base64 = data.get('image')
     # Convert base64 to PIL Image
     input_image = base64_to_image(image_base64)
 
     prompt = (
-        "make me do pottery in a saudi old scene, matching the theme عام الحرف اليدوية",
+        """
+        Transform the person in the input image into a highly photorealistic scene.
+
+        Identity:
+        Preserve exact facial features, face structure, skin tone, and identity.
+        This must remain the same real person. Do NOT alter facial identity.
+
+        Selected Craft (MANDATORY):
+        Traditional pottery (الفخار)
+
+        The image must clearly depict ONLY this craft.
+
+        Scene:
+        Depict a historic Saudi village or traditional workshop environment that matches the selected craft.
+        Use authentic tools and materials only.
+
+        Clothing:
+        Preserve the original clothing as closely as possible.
+        If exact preservation conflicts with realism or the selected craft activity,
+        make the smallest possible adjustment while maintaining modesty and authenticity.
+        Do NOT stylize or modernize clothing.
+
+        Theme:
+        عام الحرف اليدوية (Year of Handicrafts)
+
+        Lighting:
+        Natural warm daylight with realistic shadows.
+
+        Style:
+        Ultra-photorealistic, professional DSLR photography.
+        Shallow depth of field, cinematic realism."""
     )
     output_image = generate_image_function(prompt, input_image)
     # Convert PIL Image back to base64
     output_base64 = image_to_base64(output_image)
     return jsonify({'image': output_base64})
+
+# ------------------------------------------------------------
+
+@app.route('/image-generator-ghibli', methods=['POST'])
+def generate_image_ghibli_route():
+    data = request.json
+    image_base64 = data.get('image')
+    # Convert base64 to PIL Image
+    input_image = base64_to_image(image_base64)
+
+    prompt = (
+        """
+        Transform the person in the input image into a Ghibli-style anime character.
+
+        Identity:
+        Preserve exact facial features, face structure, skin tone, and identity.
+        This must remain the same real person. Do NOT alter facial identity.
+
+        Scene:
+        AlUla Elephant Rock (Jabal AlFil) in Saudi Arabia, 
+        include the text "AlUla" in the image.
+
+        Clothing:
+        Preserve the original clothing as closely as possible.
+        If exact preservation conflicts with realism or the anime character activity,
+        make the smallest possible adjustment while maintaining modesty and authenticity.
+        Do NOT stylize or modernize clothing.
+
+        Theme:
+        عام الحرف اليدوية (Year of Handicrafts)
+
+        """
+    )
+    output_image = generate_image_function(prompt, input_image)
+    # Convert PIL Image back to base64
+    output_base64 = image_to_base64(output_image)
+    return jsonify({'image': output_base64})
+
+# ------------------------------------------------------------
+
+@app.route('/image-generator-palm-craft', methods=['POST'])
+def generate_image_palm_craft_route():
+    data = request.json
+    image_base64 = data.get('image')
+    # Convert base64 to PIL Image
+    input_image = base64_to_image(image_base64)
+
+    prompt = (
+        """
+        Transform the person in the input image into a highly photorealistic scene.
+
+        Identity:
+        Preserve exact facial features, face structure, skin tone, and identity.
+        This must remain the same real person. Do NOT alter facial identity.
+
+        Selected Craft (MANDATORY):
+        Palm leaf weaving (الخوص)
+
+        The image must clearly depict ONLY this craft.
+
+        Scene:
+        Depict a historic Saudi village or traditional workshop environment that matches the selected craft.
+        Use authentic tools and materials only.
+
+        Clothing:
+        Preserve the original clothing as closely as possible.
+        If exact preservation conflicts with realism or the selected craft activity,
+        make the smallest possible adjustment while maintaining modesty and authenticity.
+        Do NOT stylize or modernize clothing.
+
+        Theme:
+        عام الحرف اليدوية (Year of Handicrafts)
+
+        Lighting:
+        Natural warm daylight with realistic shadows.
+
+        Style:
+        Ultra-photorealistic, professional DSLR photography.
+        Shallow depth of field, cinematic realism."""
+    )
+    output_image = generate_image_function(prompt, input_image)
+    # Convert PIL Image back to base64
+    output_base64 = image_to_base64(output_image)
+    return jsonify({'image': output_base64})
+
+# ------------------------------------------------------------
+
+@app.route('/image-generator-embroidery', methods=['POST'])
+def generate_image_embroidery_route():
+    data = request.json
+    image_base64 = data.get('image')
+    # Convert base64 to PIL Image
+    input_image = base64_to_image(image_base64)
+
+    prompt = (
+        """
+        Transform the person in the input image into a highly photorealistic scene.
+
+        Identity:
+        Preserve exact facial features, face structure, skin tone, and identity.
+        This must remain the same real person. Do NOT alter facial identity.
+
+        Selected Craft (MANDATORY):
+        Traditional embroidery (الطرز)
+
+        The image must clearly depict ONLY this craft.
+
+        Scene:
+        Depict a historic Saudi village or traditional workshop environment that matches the selected craft.
+        Use authentic tools and materials only, similar to the reference image.
+
+        Clothing:
+        Preserve the original clothing as closely as possible.
+        If exact preservation conflicts with realism or the selected craft activity,
+        make the smallest possible adjustment while maintaining modesty and authenticity.
+        Do NOT stylize or modernize clothing.
+
+        Theme:
+        عام الحرف اليدوية (Year of Handicrafts)
+
+        Lighting:
+        Natural warm daylight with realistic shadows.
+
+        Style:
+        Ultra-photorealistic, professional DSLR photography.
+        Shallow depth of field, cinematic realism."""
+    )
+    output_image = generate_image_function_reference(prompt, input_image)
+    # Convert PIL Image back to base64
+    output_base64 = image_to_base64(output_image)
+    return jsonify({'image': output_base64})
+
+def generate_image_function_reference(prompt: str, image: Image.Image) -> Image.Image:
+    start_time = time.time()
+    response = client.models.generate_content(
+    model="gemini-3-pro-image-preview",
+    contents=[
+        prompt,
+        image,
+        Image.open("./references/embroidery.jpg")
+    ],
+    config=types.GenerateContentConfig(
+        response_modalities=['TEXT', 'IMAGE'],
+        image_config=types.ImageConfig(
+            aspect_ratio=aspect_ratio,
+            image_size=resolution
+            ),
+        )
+    )
+
+    result_image = None
+    for part in response.parts:
+        if part.text is not None:
+            print(part.text)
+        elif part.inline_data is not None:
+            # Get raw image bytes from the response
+            image_bytes = part.inline_data.data
+            result_image = Image.open(BytesIO(image_bytes))
+    end_time = time.time()
+    print(f"Time taken: {end_time - start_time} seconds")
+    return result_image
 
 
 # generate image FUNCTION
@@ -70,6 +261,7 @@ def generate_image_function(prompt: str, image: Image.Image) -> Image.Image:
     print(f"Time taken: {end_time - start_time} seconds")
     return result_image
 
+# ------------------------ BASE64 TO IMAGE AND IMAGE TO BASE64 --------------------------------
 
 def base64_to_image(base64_string: str) -> Image.Image:
     """Convert base64 string to PIL Image"""
@@ -85,7 +277,7 @@ def image_to_base64(image: Image.Image) -> str:
     image.save(buffered, format="PNG")
     return base64.b64encode(buffered.getvalue()).decode('utf-8')
 
-
+# ------------------------ PRINTING --------------------------------
 
 # CONFIGURATION FPR PRINTING
 UPLOAD_FOLDER = os.getcwd()
@@ -193,6 +385,7 @@ def print_image_silently(image_path):
 def cleanup():
     os.remove('image_print_job.png')
 
+# ------------------------ RUN THE APP --------------------------------
 if __name__ == '__main__':
     app.run(host='127.0.0.1', port=5000, debug=True)
 
