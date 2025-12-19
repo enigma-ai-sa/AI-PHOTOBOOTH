@@ -2,7 +2,7 @@
 
 import { useRef, useCallback, useState } from "react";
 import Webcam from "react-webcam";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import Logo from "@/components/Logo";
 import { IoCameraOutline } from "react-icons/io5";
 import { BiArrowBack } from "react-icons/bi";
@@ -10,6 +10,8 @@ import { BiArrowBack } from "react-icons/bi";
 export default function Camera() {
   const webcamRef = useRef<Webcam>(null);
   const router = useRouter();
+  const searchParams = useSearchParams();
+  const endpoint = searchParams.get("endpoint");
   const [isCapturing, setIsCapturing] = useState(false);
   const [isCountingDown, setIsCountingDown] = useState(false);
   const [countdownNumber, setCountdownNumber] = useState(3);
@@ -46,6 +48,10 @@ export default function Camera() {
           // Get RGBA format image data
           const rgbaImageSrc = canvas.toDataURL("image/png");
           localStorage.setItem("capturedImage", rgbaImageSrc);
+          // Store the selected endpoint
+          if (endpoint) {
+            localStorage.setItem("selectedEndpoint", endpoint);
+          }
         } catch (error) {
           console.warn(
             "Canvas processing failed, using original image:",
@@ -53,11 +59,14 @@ export default function Camera() {
           );
           // Fallback to original image
           localStorage.setItem("capturedImage", imageSrc);
+          if (endpoint) {
+            localStorage.setItem("selectedEndpoint", endpoint);
+          }
         }
 
         cleanup();
         setTimeout(() => {
-          router.push("/processing");
+          router.push("/preview");
         }, 500);
       };
 
@@ -66,9 +75,12 @@ export default function Camera() {
       img.onerror = () => {
         console.warn("Image loading failed, using original image");
         localStorage.setItem("capturedImage", imageSrc);
+        if (endpoint) {
+          localStorage.setItem("selectedEndpoint", endpoint);
+        }
         cleanup();
         setTimeout(() => {
-          router.push("/processing");
+          router.push("/preview");
         }, 500);
       };
 
@@ -76,13 +88,16 @@ export default function Camera() {
       timeoutId = setTimeout(() => {
         console.warn("Image processing timeout, using original image");
         localStorage.setItem("capturedImage", imageSrc);
+        if (endpoint) {
+          localStorage.setItem("selectedEndpoint", endpoint);
+        }
         cleanup();
         router.push("/processing");
       }, 10000);
 
       img.src = imageSrc;
     }
-  }, [router]);
+  }, [router, endpoint]);
 
   const startCountdown = useCallback(() => {
     if (isCountingDown || isCapturing) return;
@@ -108,28 +123,23 @@ export default function Camera() {
   };
 
   return (
-    <div className="h-screen custom-brand-gradient grid grid-rows-[auto_1fr_auto] py-20 px-10 gap-20 overflow-hidden">
-      <Logo text={"Get ready to have your photo taken!"} />
-
-      <div className="relative w-full mx-auto flex-1 flex flex-col">
-        <p className="text-lg text-stone-300 text-center mb-4">
-          Position yourself in the frame
-        </p>
-        <div className="rounded-2xl overflow-hidden border-4 border-purple-600 shadow-2xl shadow-purple-900/50 w-full flex-1">
+    <div className="h-screen bg-white p-8 overflow-hidden flex w-full flex-col">
+      <div className="relative w-full h-full mx-auto flex-1 flex flex-col">
+        <div className="rounded-3xl overflow-hidden border-4 border-gradient-blue-end w-full flex-1">
           <Webcam
             audio={false}
             ref={webcamRef}
             screenshotFormat="image/png"
             videoConstraints={videoConstraints}
-            className="w-full h-full object-cover transform -scale-x-100"
+            className="w-full h-full object-cover transform -scale-x-100 rounded-3xl overflow-hidden"
             style={{ height: "100%" }}
           />
         </div>
 
         {isCountingDown && (
           <div className="absolute inset-0 flex items-center justify-center">
-            <div className="bg-primary-light-blue-500 animate-pulse border-14 border-light-blue-600 bg-opacity-50 rounded-full w-32 h-32 flex items-center justify-center">
-              <div className="text-6xl font-bold text-white">
+            <div className="bg-gradient-blue-end animate-pulse border-gradieny-blue-endborder-14 border-bg-opacity-50 rounded-full w-62 h-62 flex items-center justify-center">
+              <div className="text-9xl font-bold text-white">
                 {countdownNumber}
               </div>
             </div>
@@ -137,27 +147,21 @@ export default function Camera() {
         )}
 
         {isCapturing && (
-          <div className="absolute inset-0 bg-white opacity-80 rounded-2xl flex items-center justify-center">
+          <div className="absolute inset-0 bg-white opacity-80 rounded-3xl flex items-center justify-center">
             <div className="text-2xl font-bold text-purple-800">Captured!</div>
           </div>
         )}
-      </div>
 
-      <div className="grid grid-cols-3 gap-4">
-        <button
-          onClick={() => router.push("/")}
-          className="text-white text-4xl flex items-center gap-2"
-        >
-          <BiArrowBack /> Back
-        </button>
-
-        <div className="flex flex-col items-center justify-center">
-          <button className="bg-white rounded-full p-8 text-primary-light-blue-700 w-fit mx-auto">
-            <IoCameraOutline size={70} onClick={startCountdown} />
+        <div className="grid grid-cols-3 gap-4 absolute bottom-8 left-8 right-8 z-10 bg-gradient-to-t from-black/30 via-black/10 to-transparent py-10 px-6 rounded-3xl backdrop-blur-sm bg-white/90">
+          <button
+            onClick={() => router.push("/select-style")}
+            className="text-gradient-blue-end text-5xl font-normal flex items-center gap-6"
+          >
+            <BiArrowBack /> Back
           </button>
-          <p className="text-lg  text-center mt-6">
-            Click and take your picture
-          </p>
+          <button className="bg-gradient-blue-end rounded-full p-8 text-white w-fit mx-auto">
+            <IoCameraOutline size={90} onClick={startCountdown} />
+          </button>
         </div>
       </div>
     </div>

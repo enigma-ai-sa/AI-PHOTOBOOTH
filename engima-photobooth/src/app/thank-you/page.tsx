@@ -1,11 +1,17 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { MdArrowOutward } from "react-icons/md";
+import { GoHome } from "react-icons/go";
 import Button from "@/components/UI/Button";
 
-export default function Home() {
+export default function ThankYou() {
   const router = useRouter();
+
+  const handleHomeScreen = () => {
+    localStorage.removeItem("capturedImage");
+    localStorage.removeItem("selectedEndpoint");
+    router.push("/");
+  };
 
   return (
     <div className="h-screen p-10 bg-white">
@@ -13,24 +19,22 @@ export default function Home() {
         <div className="h-30" />
 
         <div className="mx-auto text-center text-gradient-blue-end font-normal flex flex-col items-center gap-8">
-          <h3 className="text-5xl">Start a brand</h3>
           <h1 className="font-medium text-[180px] leading-[1.1]">
-            New AI
-            <span className="block font-normal text-[130px]">Experience</span>
+            Thank You!
           </h1>
-          <h3 className="text-5xl">like you never hand before</h3>
+          <h3 className="text-5xl">We hope you enjoyed your AI experience</h3>
         </div>
 
         <div className="mx-auto text-center text-gradient-blue-end w-full flex flex-col gap-6 font-normal">
-          <h3 className="text-4xl">Create your photo and share your joy!</h3>
+          <h3 className="text-4xl">Share your joy and come back soon!</h3>
           <Button
-            onClick={() => router.push("/select-style")}
+            onClick={handleHomeScreen}
             variant="primary"
             size="large"
             className="w-full flex items-center justify-center gap-4"
           >
-            Start Now
-            <MdArrowOutward size={46} />
+            <GoHome size={46} />
+            Home Screen
           </Button>
         </div>
       </div>

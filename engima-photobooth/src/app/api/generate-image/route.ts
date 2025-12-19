@@ -5,16 +5,20 @@ const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || "http://127.0.0.1:500
 
 export async function POST(request: NextRequest) {
   try {
-    const { image } = await request.json();
+    const { image, endpoint } = await request.json();
 
     if (!image) {
       return NextResponse.json({ error: "No image provided" }, { status: 400 });
     }
 
-    console.log("🎨 Sending image to Flask backend for generation...");
+    if (!endpoint) {
+      return NextResponse.json({ error: "No endpoint provided" }, { status: 400 });
+    }
 
-    // Call Flask backend /image-generator-1 endpoint
-    const response = await fetch(`${BACKEND_URL}/image-generator-1`, {
+    console.log(`🎨 Sending image to Flask backend for generation using endpoint: ${endpoint}...`);
+
+    // Call Flask backend with the selected endpoint
+    const response = await fetch(`${BACKEND_URL}${endpoint}`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",

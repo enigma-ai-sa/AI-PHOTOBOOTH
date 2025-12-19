@@ -1,4 +1,4 @@
-@import url("https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&display=swap");
+@import url("https://fonts.googleapis.com/css2?family=Alexandria:wght@100..900&display=swap");
 
 @import "tailwindcss";
 
@@ -10,8 +10,13 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: "Orbitron", "Neuropol X Cond Bold", monospace;
-  --font-mono: "Orbitron", "Neuropol X Cond Bold", monospace;
+  --font-sans: "Alexandria", "Neuropol X Cond Bold", monospace;
+  --font-mono: "Alexandria", "Neuropol X Cond Bold", monospace;
+
+  /* Blue Gradient */
+  --color-gradient-blue-start: #153c61;
+  --color-gradient-blue-end: #05233f;
+  --color-accent-gray-100: #DADADA
 
   /* PRIMARY PURPLE Palette */
   --color-primary-purple-700: #000000;
@@ -64,9 +69,9 @@
 }
 
 body {
-  background: var(--background);
+  background: var(--color-foreground);
   color: var(--foreground);
-  font-family: "Orbitron", "Neuropol X Cond Bold", monospace;
+  font-family: "Alexandria", "Neuropol X Cond Bold", monospace;
   font-weight: 700;
 }
 
@@ -83,6 +88,40 @@ body {
   background-repeat: no-repeat;
   background-position: center;
   position: relative;
+}
+
+@layer utilities {
+  .bg-gradient-blue {
+    background-image: linear-gradient(
+      var(--color-gradient-blue-end),
+      var(--color-gradient-blue-start)
+    );
+  }
+
+  .bg-gradient-light-blue-white {
+    background: linear-gradient(to bottom, #d7f1ff 30%, #ffffff 100%);
+  }
+}
+
+@layer utilities {
+  .border-gradient-blue-white {
+    position: relative;
+    border-radius: 1.5rem; /* Match rounded-3xl from Tailwind */
+  }
+
+  .border-gradient-blue-white::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: 1.5rem;
+    padding: 1px; /* Border width */
+    background: linear-gradient(to bottom, #153c61 0%, #ffffff 100%);
+    -webkit-mask: linear-gradient(#ffffff 0 0) content-box,
+      linear-gradient(#ffffff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+  }
 }
 
 .custom-brand-gradient::before {
