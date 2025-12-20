@@ -1,10 +1,9 @@
 "use client";
 
-import { useRouter } from "next/navigation";
-import { useEffect, useState, useRef } from "react";
-import { GoHome } from "react-icons/go";
-import { IoPrint, IoPrintOutline, IoRefreshOutline } from "react-icons/io5";
 import Button from "@/components/UI/Button";
+import { useRouter } from "next/navigation";
+import { useEffect, useRef, useState } from "react";
+import { IoPrint, IoRefreshOutline } from "react-icons/io5";
 
 export default function Processing() {
   const [capturedImage, setCapturedImage] = useState<string | null>(null);
@@ -147,8 +146,8 @@ export default function Processing() {
               </div>
             </div>
           ) : error ? (
-            <div className="relative w-full h-full bg-stone-600 flex items-center justify-center p-4">
-              <div className="text-center">
+            <div className="relative w-full h-full bg-stone-600 flex items-center justify-center p-4 mx-auto">
+              <div className="text-center mx-auto">
                 <p className="text-red-400 mb-4 text-2xl">{error}</p>
                 <Button
                   onClick={() => generateImage(capturedImage!, 0)}

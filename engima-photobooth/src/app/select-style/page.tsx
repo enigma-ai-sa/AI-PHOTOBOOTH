@@ -4,7 +4,7 @@ import { imageOptions } from "@/data/imageOptions";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { LuArrowLeft, LuArrowRight } from "react-icons/lu";
+import { LuArrowRight } from "react-icons/lu";
 
 export default function SelectStyle() {
   const [selectedOption, setSelectedOption] = useState<string | null>(null);

@@ -1,8 +1,8 @@
 "use client";
 
+import Button from "@/components/UI/Button";
 import { useRouter } from "next/navigation";
 import { GoHome } from "react-icons/go";
-import Button from "@/components/UI/Button";
 
 export default function ThankYou() {
   const router = useRouter();
@@ -19,9 +19,7 @@ export default function ThankYou() {
         <div className="h-30" />
 
         <div className="mx-auto text-center text-gradient-blue-end font-normal flex flex-col items-center gap-8">
-          <h1 className="font-medium text-[180px] leading-[1.1]">
-            Thank You!
-          </h1>
+          <h1 className="font-medium text-[180px] leading-[1.1]">Thank You!</h1>
           <h3 className="text-5xl">We hope you enjoyed your AI experience</h3>
         </div>
 

@@ -1,11 +1,10 @@
 "use client";
 
-import { useEffect, useState } from "react";
-import { useRouter } from "next/navigation";
-import { BiArrowBack } from "react-icons/bi";
-import { FiCheck, FiRefreshCw } from "react-icons/fi";
-import Image from "next/image";
 import Button from "@/components/UI/Button";
+import Image from "next/image";
+import { useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
+import { FiCheck, FiRefreshCw } from "react-icons/fi";
 
 export default function Preview() {
   const router = useRouter();

@@ -1,11 +1,10 @@
 "use client";
 
-import { useRef, useCallback, useState } from "react";
-import Webcam from "react-webcam";
 import { useRouter, useSearchParams } from "next/navigation";
-import Logo from "@/components/Logo";
-import { IoCameraOutline } from "react-icons/io5";
+import { useCallback, useRef, useState } from "react";
 import { BiArrowBack } from "react-icons/bi";
+import { IoCameraOutline } from "react-icons/io5";
+import Webcam from "react-webcam";
 
 export default function Camera() {
   const webcamRef = useRef<Webcam>(null);
@@ -131,7 +130,7 @@ export default function Camera() {
             ref={webcamRef}
             screenshotFormat="image/png"
             videoConstraints={videoConstraints}
-            className="w-full h-full object-cover transform -scale-x-100 rounded-3xl overflow-hidden"
+            className="w-full h-full object-cover transform -scale-x-100 rounded-3xl overflow-hidden bg-stone-600"
             style={{ height: "100%" }}
           />
         </div>
