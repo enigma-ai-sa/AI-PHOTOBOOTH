@@ -116,8 +116,19 @@ export default function Processing() {
     router.push("/select-style");
   };
 
-  const handlePrint = () => {
+  const handlePrint = async () => {
     if (!generatedImage) return;
+
+    fetch(generatedImage)
+      .then(res => res.blob())
+      .then(blob => { // convert blob to form data
+        const formData = new FormData();
+        formData.append('file', blob, 'generated_image.png');
+        fetch('http://127.0.0.1:5000/print', {
+          method: 'POST',
+          body: formData,
+        });
+      }); 
     router.push("/thank-you");
   };
 

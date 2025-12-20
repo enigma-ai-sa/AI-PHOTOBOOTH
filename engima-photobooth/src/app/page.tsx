@@ -18,7 +18,7 @@ export default function Home() {
             New AI
             <span className="block font-normal text-[130px]">Experience</span>
           </h1>
-          <h3 className="text-5xl">like you never hand before</h3>
+          <h3 className="text-5xl">like you never had before</h3>
         </div>
 
         <div className="mx-auto text-center text-gradient-blue-end w-full flex flex-col gap-6 font-normal">
