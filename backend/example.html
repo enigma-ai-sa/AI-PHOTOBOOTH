@@ -342,6 +342,36 @@
             box-shadow: 0 4px 15px rgba(196, 92, 62, 0.3);
         }
 
+        .input-toggle {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 1rem;
+        }
+
+        .toggle-btn {
+            flex: 1;
+            padding: 0.8rem 1rem;
+            font-family: 'Outfit', sans-serif;
+            font-size: 0.95rem;
+            font-weight: 500;
+            color: var(--sand);
+            background: rgba(0,0,0,0.2);
+            border: 1px solid rgba(212, 165, 116, 0.3);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .toggle-btn:hover {
+            border-color: var(--gold);
+        }
+
+        .toggle-btn.active {
+            background: linear-gradient(135deg, rgba(201, 162, 39, 0.2), rgba(212, 165, 116, 0.15));
+            border-color: var(--gold);
+            color: var(--gold);
+        }
+
         @media (max-width: 768px) {
             .container {
                 grid-template-columns: 1fr;
@@ -363,15 +393,26 @@
         <div class="panel">
             <h2 class="panel-title">Capture Your Image</h2>
             
+            <div class="input-toggle">
+                <button class="toggle-btn active" id="cameraToggle">📷 Camera</button>
+                <button class="toggle-btn" id="uploadToggle">📁 Upload</button>
+            </div>
+            
             <div class="camera-container" id="cameraContainer">
                 <video id="videoFeed" autoplay playsinline></video>
                 <canvas id="captureCanvas" style="display: none;"></canvas>
             </div>
             
-            <div class="camera-controls">
+            <div class="camera-controls" id="cameraControls">
                 <button class="camera-btn" id="startCameraBtn">📷 Start Camera</button>
-                <button class="camera-btn capture" id="captureBtn" disabled>�� Take Photo</button>
+                <button class="camera-btn capture" id="captureBtn" disabled>📸 Take Photo</button>
                 <button class="camera-btn retake" id="retakeBtn" style="display: none;">🔄 Retake</button>
+            </div>
+            
+            <div class="upload-zone" id="uploadZone" style="display: none;">
+                <div class="upload-icon">📁</div>
+                <p class="upload-text">Drag & drop an image here<br>or click to browse</p>
+                <input type="file" id="fileInput" accept="image/*">
             </div>
             
             <div class="preview-container" id="previewContainer">
@@ -417,10 +458,90 @@
         const placeholder = document.getElementById('placeholder');
         const errorMsg = document.getElementById('errorMsg');
         const printBtn = document.getElementById('printBtn');
+        
+        // Upload elements
+        const cameraToggle = document.getElementById('cameraToggle');
+        const uploadToggle = document.getElementById('uploadToggle');
+        const uploadZone = document.getElementById('uploadZone');
+        const fileInput = document.getElementById('fileInput');
+        const cameraControls = document.getElementById('cameraControls');
 
         let imageBase64 = null;
         let generatedImageBase64 = null;
         let stream = null;
+
+        // Toggle between camera and upload modes
+        cameraToggle.addEventListener('click', () => {
+            cameraToggle.classList.add('active');
+            uploadToggle.classList.remove('active');
+            cameraContainer.style.display = 'block';
+            cameraControls.style.display = 'flex';
+            uploadZone.style.display = 'none';
+        });
+
+        uploadToggle.addEventListener('click', () => {
+            uploadToggle.classList.add('active');
+            cameraToggle.classList.remove('active');
+            cameraContainer.style.display = 'none';
+            cameraControls.style.display = 'none';
+            uploadZone.style.display = 'block';
+            // Stop camera if running
+            if (stream) {
+                stream.getTracks().forEach(track => track.stop());
+                stream = null;
+                startCameraBtn.style.display = 'block';
+                captureBtn.disabled = true;
+            }
+        });
+
+        // Upload zone click
+        uploadZone.addEventListener('click', () => {
+            fileInput.click();
+        });
+
+        // Drag and drop handlers
+        uploadZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadZone.classList.add('dragover');
+        });
+
+        uploadZone.addEventListener('dragleave', () => {
+            uploadZone.classList.remove('dragover');
+        });
+
+        uploadZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadZone.classList.remove('dragover');
+            const file = e.dataTransfer.files[0];
+            if (file && file.type.startsWith('image/')) {
+                handleFileUpload(file);
+            }
+        });
+
+        // File input change
+        fileInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) {
+                handleFileUpload(file);
+            }
+        });
+
+        // Handle file upload
+        function handleFileUpload(file) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                imageBase64 = e.target.result;
+                previewImage.src = imageBase64;
+                previewContainer.classList.add('active');
+                uploadZone.style.display = 'none';
+                generateBtn.disabled = false;
+                
+                // Show retake button to allow re-upload
+                retakeBtn.style.display = 'block';
+                retakeBtn.textContent = '🔄 Choose Another';
+            };
+            reader.readAsDataURL(file);
+        }
 
         // Start camera
         startCameraBtn.addEventListener('click', async () => {
@@ -466,14 +587,24 @@
             generateBtn.disabled = false;
         });
 
-        // Retake photo
+        // Retake photo or choose another file
         retakeBtn.addEventListener('click', () => {
             imageBase64 = null;
             previewContainer.classList.remove('active');
-            videoFeed.style.display = 'block';
-            captureBtn.style.display = 'block';
-            retakeBtn.style.display = 'none';
             generateBtn.disabled = true;
+            
+            if (uploadToggle.classList.contains('active')) {
+                // Upload mode
+                uploadZone.style.display = 'block';
+                retakeBtn.style.display = 'none';
+                fileInput.value = ''; // Reset file input
+            } else {
+                // Camera mode
+                videoFeed.style.display = 'block';
+                captureBtn.style.display = 'block';
+                retakeBtn.style.display = 'none';
+                retakeBtn.textContent = '🔄 Retake';
+            }
         });
 
         // Generate image

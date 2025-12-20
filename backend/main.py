@@ -33,11 +33,11 @@ def generate_image_pottery_route():
 
     prompt = (
         """
-        Transform the person in the input image into a highly photorealistic scene.
+        Transform the person(s) in the input image into a highly photorealistic scene.
 
         Identity:
         Preserve exact facial features, face structure, skin tone, and identity.
-        This must remain the same real person. Do NOT alter facial identity.
+        This must remain the same real person(s). Do NOT alter facial identity.
 
         Selected Craft (MANDATORY):
         Traditional pottery (الفخار)
@@ -80,11 +80,11 @@ def generate_image_ghibli_route():
 
     prompt = (
         """
-        Transform the person in the input image into a Ghibli-style anime character.
+        Transform the person(s) in the input image into a Ghibli-style anime character.
 
         Identity:
         Preserve exact facial features, face structure, skin tone, and identity.
-        This must remain the same real person. Do NOT alter facial identity.
+        This must remain the same real person(s). Do NOT alter facial identity.
 
         Scene:
         AlUla Elephant Rock (Jabal AlFil) in Saudi Arabia, 
@@ -117,11 +117,11 @@ def generate_image_palm_craft_route():
 
     prompt = (
         """
-        Transform the person in the input image into a highly photorealistic scene.
+        Transform the person(s) in the input image into a highly photorealistic scene.
 
         Identity:
         Preserve exact facial features, face structure, skin tone, and identity.
-        This must remain the same real person. Do NOT alter facial identity.
+        This must remain the same real person(s). Do NOT alter facial identity.
 
         Selected Craft (MANDATORY):
         Palm leaf weaving (الخوص)
@@ -164,11 +164,11 @@ def generate_image_embroidery_route():
 
     prompt = (
         """
-        Transform the person in the input image into a highly photorealistic scene.
+        Transform the person(s) in the input image into a highly photorealistic scene.
 
         Identity:
         Preserve exact facial features, face structure, skin tone, and identity.
-        This must remain the same real person. Do NOT alter facial identity.
+        This must remain the same real person(s). Do NOT alter facial identity.
 
         Selected Craft (MANDATORY):
         Traditional embroidery (الطرز)

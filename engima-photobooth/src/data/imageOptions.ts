@@ -8,26 +8,26 @@ export interface ImageOption {
 export const imageOptions: ImageOption[] = [
   {
     id: "pottery",
-    label: "Pottery Making",
+    label: "pottery (الفخار)",
     image: "/selectImage/pottery.jpg",
     endpoint: "/image-generator-pottery",
   },
   {
     id: "palm-craft",
-    label: "Sewing/Weaving",
-    image: "/selectImage/palmCraft.jpg",
+    label: "Palm leaf weaving (الخوص)",
+    image: "/selectImage/palmcraft.png",
     endpoint: "/image-generator-palm-craft",
   },
   {
-    id: "ahlam-logo",
-    label: "Ahlam Logo",
-    image: "/selectImage/ahlamLogo.jpg",
+    id: "embroidery",
+    label: "Traditional embroidery (الطرز)",
+    image: "/selectImage/embroidery.png",
     endpoint: "/image-generator-embroidery",
   },
   {
-    id: "alula-selfie",
-    label: "Al-Ula Background Selfie",
-    image: "/selectImage/alulaSelfie.jpg",
+    id: "ghibli",
+    label: "Ghibli style (غبلي)",
+    image: "/selectImage/ghibli.png",
     endpoint: "/image-generator-ghibli",
   },
 ];
