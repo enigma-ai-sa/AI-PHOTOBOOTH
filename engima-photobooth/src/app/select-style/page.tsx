@@ -43,37 +43,55 @@ export default function SelectStyle() {
           </h2>
 
           {/* Image Options Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-6 flex-1 min-h-0">
+          <div className="grid grid-cols-1 md:grid-cols-2 md:grid-rows-[1fr_1fr_auto] gap-6 flex-1 min-h-0">
             {imageOptions.map((option) => (
               <div
                 key={option.id}
-                className={`relative cursor-pointer rounded-[25px] md:rounded-[50px] transition-all duration-200 border-8 md:border-[15px] overflow-hidden flex flex-col ${
+                className={`relative cursor-pointer rounded-[25px] md:rounded-[50px] transition-all duration-200 border-8 md:border-[15px] overflow-hidden ${
+                  option.image ? "flex flex-col" : "md:col-span-2 flex items-center justify-center h-30"
+                } ${
                   selectedOption === option.id
                     ? "border-gradient-blue-end bg-gradient-blue-end"
                     : "border-gray-400 hover:scale-[1.02] bg-gray-400"
                 }`}
                 onClick={() => handleOptionSelect(option.id)}
               >
-                <div className="flex-1 relative">
-                  <Image
-                    src={option.image}
-                    alt={option.label}
-                    fill
-                    className="object-cover rounded-4xl object-top"
-                    priority
-                  />
-                </div>
-                <div
-                  className={`p-6 transition-colors duration-200 flex-shrink-0 ${
-                    selectedOption === option.id
-                      ? "bg-gradient-blue-end text-white"
-                      : "bg-gray-400  text-black"
-                  }`}
-                >
-                  <p className="text-center font-medium text-2xl">
-                    {option.label}
-                  </p>
-                </div>
+                {option.image ? (
+                  <>
+                    <div className="flex-1 relative">
+                      <Image
+                        src={option.image}
+                        alt={option.label}
+                        fill
+                        className="object-cover rounded-4xl object-top"
+                        priority
+                      />
+                    </div>
+                    <div
+                      className={`p-6 transition-colors duration-200 flex-shrink-0 ${
+                        selectedOption === option.id
+                          ? "bg-gradient-blue-end text-white"
+                          : "bg-gray-400  text-black"
+                      }`}
+                    >
+                      <p className="text-center font-medium text-2xl">
+                        {option.label}
+                      </p>
+                    </div>
+                  </>
+                ) : (
+                  <div
+                    className={`p-6 transition-colors duration-200 w-full ${
+                      selectedOption === option.id
+                        ? "bg-gradient-blue-end text-white"
+                        : "bg-gray-400  text-black"
+                    }`}
+                  >
+                    <p className="text-center font-medium text-2xl">
+                      {option.label}
+                    </p>
+                  </div>
+                )}
               </div>
             ))}
           </div>

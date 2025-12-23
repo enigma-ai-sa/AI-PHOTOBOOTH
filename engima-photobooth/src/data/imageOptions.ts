@@ -1,7 +1,7 @@
 export interface ImageOption {
   id: string;
   label: string;
-  image: string;
+  image?: string;
   endpoint: string;
 }
 
@@ -29,5 +29,10 @@ export const imageOptions: ImageOption[] = [
     label: "Ghibli style (غبلي)",
     image: "/selectImage/ghibli.png",
     endpoint: "/image-generator-ghibli",
+  },
+  {
+    id: "realestic",
+    label: "realestic style (واقعي)",
+    endpoint: "/image-generator-realestic",
   },
 ];
