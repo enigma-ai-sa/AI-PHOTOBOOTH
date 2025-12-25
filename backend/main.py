@@ -229,7 +229,7 @@ def generate_image_function_reference(prompt: str, image: Image.Image) -> Image.
         Image.open("./references/embroidery.jpg")
     ],
     config=types.GenerateContentConfig(
-        response_modalities=['TEXT', 'IMAGE'],
+        response_modalities=['IMAGE'],
         image_config=types.ImageConfig(
             aspect_ratio=aspect_ratio,
             image_size=resolution
@@ -260,7 +260,7 @@ def generate_image_function(prompt: str, image: Image.Image) -> Image.Image:
         image,
     ],
     config=types.GenerateContentConfig(
-        response_modalities=['TEXT', 'IMAGE'],
+        response_modalities=['IMAGE'],
         image_config=types.ImageConfig(
             aspect_ratio=aspect_ratio,
             image_size=resolution
