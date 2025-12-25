@@ -119,6 +119,9 @@ export default function Camera() {
 
   const videoConstraints = {
     facingMode: "user",
+    width: { ideal: 6000 },
+    height: { ideal: 4000 },
+    aspectRatio: 3 / 2, // Canon EOS R50 photo aspect ratio
   };
 
   
@@ -126,7 +129,7 @@ export default function Camera() {
     <div className="h-screen bg-white p-8 overflow-hidden flex w-full flex-col">
       {/* Camera container - centered */}
       <div className="relative w-full max-w-6xl mx-auto flex-1 flex items-center justify-center">
-        <div className="rounded-3xl overflow-hidden border-4 border-gradient-blue-end w-full aspect-video relative">
+        <div className="rounded-3xl overflow-hidden border-4 border-gradient-blue-end w-full aspect-[3/2] relative">
           <Webcam
             audio={false}
             ref={webcamRef}
