@@ -33,6 +33,6 @@ export const imageOptions: ImageOption[] = [
   {
     id: "realestic",
     label: "realestic style (واقعي)",
-    endpoint: "/image-generator-realestic",
+    endpoint: "/image-generator-realistic",
   },
 ];

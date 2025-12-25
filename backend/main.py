@@ -155,6 +155,42 @@ def generate_image_palm_craft_route():
 
 # ------------------------------------------------------------
 
+@app.route('/image-generator-realistic', methods=['POST'])
+def generate_image_realistic_route():
+    data = request.json
+    image_base64 = data.get('image')
+    # Convert base64 to PIL Image
+    input_image = base64_to_image(image_base64)
+
+    prompt = (
+        """
+        Transform the person(s) in the input image into a highly photorealistic scene.
+
+        Identity:
+        Preserve exact facial features, face structure, skin tone, and identity.
+        This must remain the same real person(s). Do NOT alter facial identity.
+
+        Scene:
+        In the background there is the famous Jabal AlFil in AlUla,Saudi Arabia.
+
+        Clothing:
+        Preserve the original clothing as closely as possible.
+        Do NOT stylize or modernize clothing.
+
+        Lighting:
+        Natural warm daylight with realistic shadows.
+
+        Style:
+        Ultra-photorealistic, professional DSLR photography.
+        Shallow depth of field, cinematic realism."""
+    )
+    output_image = generate_image_function(prompt, input_image)
+    # Convert PIL Image back to base64
+    output_base64 = image_to_base64(output_image)
+    return jsonify({'image': output_base64})
+
+# ------------------------------------------------------------
+
 @app.route('/image-generator-embroidery', methods=['POST'])
 def generate_image_embroidery_route():
     data = request.json
