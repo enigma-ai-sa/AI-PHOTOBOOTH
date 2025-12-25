@@ -121,47 +121,50 @@ export default function Camera() {
     facingMode: "user",
   };
 
+  
   return (
     <div className="h-screen bg-white p-8 overflow-hidden flex w-full flex-col">
-      <div className="relative w-full h-full mx-auto flex-1 flex flex-col">
-        <div className="rounded-3xl overflow-hidden border-4 border-gradient-blue-end w-full flex-1">
+      {/* Camera container - centered */}
+      <div className="relative w-full max-w-6xl mx-auto flex-1 flex items-center justify-center">
+        <div className="rounded-3xl overflow-hidden border-4 border-gradient-blue-end w-full aspect-video relative">
           <Webcam
             audio={false}
             ref={webcamRef}
             screenshotFormat="image/png"
             videoConstraints={videoConstraints}
             className="w-full h-full object-cover transform -scale-x-100 rounded-3xl overflow-hidden bg-stone-600"
-            style={{ height: "100%" }}
           />
-        </div>
 
-        {isCountingDown && (
-          <div className="absolute inset-0 flex items-center justify-center">
-            <div className="bg-gradient-blue-end animate-pulse border-gradieny-blue-endborder-14 border-bg-opacity-50 rounded-full w-62 h-62 flex items-center justify-center">
-              <div className="text-9xl font-bold text-white">
-                {countdownNumber}
+          {isCountingDown && (
+            <div className="absolute inset-0 flex items-center justify-center">
+              <div className="bg-gradient-blue-end animate-pulse border-gradieny-blue-endborder-14 border-bg-opacity-50 rounded-full w-62 h-62 flex items-center justify-center">
+                <div className="text-9xl font-bold text-white">
+                  {countdownNumber}
+                </div>
               </div>
             </div>
-          </div>
-        )}
+          )}
 
-        {isCapturing && (
-          <div className="absolute inset-0 bg-white opacity-80 rounded-3xl flex items-center justify-center">
-            <div className="text-2xl font-bold text-purple-800">Captured!</div>
-          </div>
-        )}
-
-        <div className="grid grid-cols-3 gap-4 absolute bottom-8 left-8 right-8 z-10 bg-gradient-to-t from-black/30 via-black/10 to-transparent py-10 px-6 rounded-3xl backdrop-blur-sm bg-white/90">
-          <button
-            onClick={() => router.push("/select-style")}
-            className="text-gradient-blue-end text-5xl font-normal flex items-center gap-6"
-          >
-            <BiArrowBack /> Back
-          </button>
-          <button className="bg-gradient-blue-end rounded-full p-8 text-white w-fit mx-auto">
-            <IoCameraOutline size={90} onClick={startCountdown} />
-          </button>
+          {isCapturing && (
+            <div className="absolute inset-0 bg-white opacity-80 rounded-3xl flex items-center justify-center">
+              <div className="text-2xl font-bold text-purple-800">Captured!</div>
+            </div>
+          )}
         </div>
+      </div>
+
+      {/* Bottom controls - outside camera container */}
+      <div className="w-full max-w-6xl mx-auto grid grid-cols-3 gap-4 py-6 px-6">
+        <button
+          onClick={() => router.push("/select-style")}
+          className="text-gradient-blue-end text-5xl font-normal flex items-center gap-6"
+        >
+          <BiArrowBack /> Back
+        </button>
+        <button className="bg-gradient-blue-end rounded-full p-8 text-white w-fit mx-auto">
+          <IoCameraOutline size={90} onClick={startCountdown} />
+        </button>
+        <div></div> {/* Empty div to maintain grid spacing */}
       </div>
     </div>
   );
