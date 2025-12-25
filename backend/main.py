@@ -87,8 +87,7 @@ def generate_image_ghibli_route():
         This must remain the same real person(s). Do NOT alter facial identity.
 
         Scene:
-        AlUla Elephant Rock (Jabal AlFil) in Saudi Arabia, 
-        include the text "AlUla" in the image.
+        Background of AlUla Elephant Rock (Jabal AlFil) in Saudi Arabia, 
 
         Clothing:
         Preserve the original clothing as closely as possible.
