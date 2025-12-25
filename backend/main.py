@@ -164,12 +164,7 @@ def generate_image_realistic_route():
 
     prompt = (
         """
-        Identity:
-        Preserve exact facial features, face structure, skin tone, and identity.
-        This must remain the same real person(s). Do NOT alter facial identity.
-
-        Scene:
-        In the background there is the famous Jabal AlFil in AlUla,Saudi Arabia.
+        put the person(s) in a scene with a background of the famous Jabal AlFil in AlUla, Saudi Arabia.
         """
     )
     output_image = generate_image_function(prompt, input_image)
