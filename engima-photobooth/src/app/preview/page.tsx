@@ -46,8 +46,9 @@ export default function Preview() {
 
   return (
     <div className="h-screen bg-white p-8 overflow-hidden flex w-full flex-col">
-      <div className="relative w-full h-full mx-auto flex-1 flex flex-col">
-        <div className="rounded-3xl overflow-hidden border-4 border-gradient-blue-end w-full flex-1 relative">
+      {/* Image container - centered */}
+      <div className="relative w-full max-w-6xl mx-auto flex-1 flex items-center justify-center">
+        <div className="rounded-3xl overflow-hidden border-4 border-gradient-blue-end w-full aspect-[3/2] relative">
           <Image
             src={capturedImage}
             alt="Captured photo"
@@ -56,25 +57,26 @@ export default function Preview() {
             unoptimized
           />
         </div>
+      </div>
 
-        <div className="grid grid-cols-2 gap-4 absolute bottom-8 left-8 right-8 z-10 bg-gradient-to-t from-black/30 via-black/10 to-transparent py-10 px-6 rounded-3xl backdrop-blur-sm bg-white/90">
-          <Button
-            onClick={handleRetake}
-            variant="tertiary"
-            size="large"
-            className="gap-6"
-          >
-            <FiRefreshCw size={50} /> Retake
-          </Button>
-          <Button
-            onClick={handleGenerate}
-            variant="primary"
-            size="large"
-            className="gap-6"
-          >
-            <FiCheck size={50} /> Generate
-          </Button>
-        </div>
+      {/* Bottom controls - outside image container */}
+      <div className="w-full max-w-6xl mx-auto grid grid-cols-2 gap-4 py-6 px-6">
+        <Button
+          onClick={handleRetake}
+          variant="tertiary"
+          size="large"
+          className="gap-6"
+        >
+          <FiRefreshCw size={50} /> Retake
+        </Button>
+        <Button
+          onClick={handleGenerate}
+          variant="primary"
+          size="large"
+          className="gap-6"
+        >
+          <FiCheck size={50} /> Generate
+        </Button>
       </div>
     </div>
   );
