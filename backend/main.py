@@ -22,7 +22,7 @@ aspect_ratio = "9:16" # "1:1","2:3","3:2","3:4","4:3","4:5","5:4","9:16","16:9",
 resolution = "1K" # "1K", "2K", "4K"
 qrCode = False
 app = Flask(__name__)
-CORS(app)
+CORS(app, resources={r"/*": {"origins": "*"}})
 
 options = {
     "ghibli": {
@@ -35,8 +35,22 @@ options = {
     "studio": {
         "prompt": """
         Take the person(s) from the provided image and generate a Studio Portrait a blurred background of sparkles.
-        Ensure the person(s)' face and features remain completely unchanged. Keep the face untouched.
+        Ensure the person(s)' face and features remain completely unchanged. Keep the face untouched, only blur the background.
         """
+    },
+    "2026": {
+        "prompt": """
+        Take the person(s) from the provided image and generate a hyper-realistic image of them with
+        the background displays a spectacular New Year's Eve atmosphere with a drone light show in the night sky explicitly spelling "2026", accompanied by elegant gold and silver fireworks. The scene is illuminated by the festival lights and starlight.
+        """,
+        "reference_images": [Image.open("./references/alula_mountains.png")]
+    },
+    "HNY": {
+        "prompt": """
+        Take the person(s) from the provided image and generate a hyper-realistic image of them with
+        the background displays a spectacular New Year's Eve atmosphere with a drone light show in the night sky explicitly spelling "Happy New Year from AlUla", accompanied by elegant gold and silver fireworks. The scene is illuminated by the festival lights and starlight.
+        """,
+        "reference_images": [Image.open("./references/alula_mountains.png")]
     }
 }
 
