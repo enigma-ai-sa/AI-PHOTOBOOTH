@@ -57,6 +57,7 @@ options = {
         "prompt": """
         Take the person(s) from the provided image and generate a hyper-realistic image of them with
         the background displays a spectacular New Year's Eve atmosphere with a drone light show in the night sky explicitly spelling "2026", accompanied by elegant gold and silver fireworks. The scene is illuminated by the festival lights and starlight.
+        Ensure the person(s)' face and features remain completely unchanged. Keep the face untouched.
         """,
         "reference_images": [Image.open("./references/alula_mountains.png")]
     },
@@ -64,6 +65,7 @@ options = {
         "prompt": """
         Take the person(s) from the provided image and generate a hyper-realistic image of them with
         the background displays a spectacular New Year's Eve atmosphere with a drone light show in the night sky explicitly spelling "Happy New Year from AlUla", accompanied by elegant gold and silver fireworks. The scene is illuminated by the festival lights and starlight.
+        Ensure the person(s)' face and features remain completely unchanged. Keep the face untouched.
         """,
         "reference_images": [Image.open("./references/alula_mountains.png")]
     }
