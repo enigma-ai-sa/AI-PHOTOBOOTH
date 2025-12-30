@@ -1,6 +1,6 @@
 "use client";
 
-import { useRouter, useSearchParams } from "next/navigation";
+import { useRouter } from "next/navigation";
 import { useCallback, useRef, useState } from "react";
 import { BiArrowBack } from "react-icons/bi";
 import { IoCameraOutline } from "react-icons/io5";
@@ -9,8 +9,6 @@ import Webcam from "react-webcam";
 export default function Camera() {
   const webcamRef = useRef<Webcam>(null);
   const router = useRouter();
-  const searchParams = useSearchParams();
-  const endpoint = searchParams.get("endpoint");
   const [isCapturing, setIsCapturing] = useState(false);
   const [isCountingDown, setIsCountingDown] = useState(false);
   const [countdownNumber, setCountdownNumber] = useState(3);
@@ -47,10 +45,6 @@ export default function Camera() {
           // Get RGBA format image data
           const rgbaImageSrc = canvas.toDataURL("image/png");
           localStorage.setItem("capturedImage", rgbaImageSrc);
-          // Store the selected endpoint
-          if (endpoint) {
-            localStorage.setItem("selectedEndpoint", endpoint);
-          }
         } catch (error) {
           console.warn(
             "Canvas processing failed, using original image:",
@@ -58,9 +52,6 @@ export default function Camera() {
           );
           // Fallback to original image
           localStorage.setItem("capturedImage", imageSrc);
-          if (endpoint) {
-            localStorage.setItem("selectedEndpoint", endpoint);
-          }
         }
 
         cleanup();
@@ -74,9 +65,6 @@ export default function Camera() {
       img.onerror = () => {
         console.warn("Image loading failed, using original image");
         localStorage.setItem("capturedImage", imageSrc);
-        if (endpoint) {
-          localStorage.setItem("selectedEndpoint", endpoint);
-        }
         cleanup();
         setTimeout(() => {
           router.push("/preview");
@@ -87,16 +75,13 @@ export default function Camera() {
       timeoutId = setTimeout(() => {
         console.warn("Image processing timeout, using original image");
         localStorage.setItem("capturedImage", imageSrc);
-        if (endpoint) {
-          localStorage.setItem("selectedEndpoint", endpoint);
-        }
         cleanup();
         router.push("/processing");
       }, 10000);
 
       img.src = imageSrc;
     }
-  }, [router, endpoint]);
+  }, [router]);
 
   const startCountdown = useCallback(() => {
     if (isCountingDown || isCapturing) return;

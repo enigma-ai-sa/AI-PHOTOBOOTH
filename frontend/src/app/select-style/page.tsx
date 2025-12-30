@@ -20,10 +20,10 @@ export default function SelectStyle() {
         (option) => option.id === selectedOption
       );
       if (selected) {
-        // Navigate to camera with the selected endpoint
-        router.push(
-          `/camera?endpoint=${encodeURIComponent(selected.endpoint)}`
-        );
+        // Store the selected option in localStorage
+        localStorage.setItem("selectedOption", selected.option);
+        // Navigate to camera
+        router.push("/camera");
       }
     }
   };
@@ -39,7 +39,7 @@ export default function SelectStyle() {
         <div className="flex-1 py-6 flex flex-col gap-15 min-h-0">
           {/* Title */}
           <h2 className="text-7xl text-gradient-blue-end font-medium text-center">
-            Choose Your Favorite <span className="block">Photo Style</span>
+            Choose Your New Year's <span className="block">Photo Style</span>
           </h2>
 
           {/* Image Options Grid */}

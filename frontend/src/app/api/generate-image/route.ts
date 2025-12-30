@@ -4,27 +4,29 @@ import { NextRequest, NextResponse } from "next/server";
 const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || "http://127.0.0.1:5000";
 
 export async function POST(request: NextRequest) {
+  console.log(`🔧 DEBUG: Using backend URL: ${BACKEND_URL}`);
   try {
-    const { image, endpoint } = await request.json();
+    const { image, option } = await request.json();
 
     if (!image) {
       return NextResponse.json({ error: "No image provided" }, { status: 400 });
     }
 
-    if (!endpoint) {
-      return NextResponse.json({ error: "No endpoint provided" }, { status: 400 });
+    if (!option) {
+      return NextResponse.json({ error: "No option provided" }, { status: 400 });
     }
 
-    console.log(`🎨 Sending image to Flask backend for generation using endpoint: ${endpoint}...`);
+    console.log(`🎨 Sending image to Flask backend for generation using option: ${option}...`);
 
-    // Call Flask backend with the selected endpoint
-    const response = await fetch(`${BACKEND_URL}${endpoint}`, {
+    // Call Flask backend with the unified endpoint
+    const response = await fetch(`${BACKEND_URL}/image-generator`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
       },
       body: JSON.stringify({
         image: image,
+        option: option,
       }),
     });
 
@@ -47,10 +49,18 @@ export async function POST(request: NextRequest) {
       ? data.image
       : `data:image/png;base64,${data.image}`;
 
+    // Handle QR code if present
+    const qrCodeUrl = data.qrCode
+      ? (data.qrCode.startsWith('data:')
+          ? data.qrCode
+          : `data:image/png;base64,${data.qrCode}`)
+      : null;
+
     console.log("✅ Image generation successful");
 
     return NextResponse.json({
       imageUrl: imageUrl,
+      qrCodeUrl: qrCodeUrl,
     });
   } catch (error: unknown) {
     console.error("❌ Error generating image:", error);

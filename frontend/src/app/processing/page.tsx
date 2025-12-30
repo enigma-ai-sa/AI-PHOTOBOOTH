@@ -1,6 +1,7 @@
 "use client";
 
 import Button from "@/components/UI/Button";
+import PrintCopiesModal from "@/components/PrintCopiesModal";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { IoPrint, IoRefreshOutline } from "react-icons/io5";
@@ -8,17 +9,20 @@ import { IoPrint, IoRefreshOutline } from "react-icons/io5";
 export default function Processing() {
   const [capturedImage, setCapturedImage] = useState<string | null>(null);
   const [generatedImage, setGeneratedImage] = useState<string | null>(null);
+  const [qrCode, setQrCode] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [retryCount, setRetryCount] = useState(0);
+  const [showPrintModal, setShowPrintModal] = useState(false);
+  const [printCopies, setPrintCopies] = useState(1);
   const hasStartedGenerationRef = useRef(false);
   const router = useRouter();
 
   useEffect(() => {
     const image = localStorage.getItem("capturedImage");
-    const endpoint = localStorage.getItem("selectedEndpoint");
+    const option = localStorage.getItem("selectedOption");
 
-    if (!image || !endpoint) {
+    if (!image || !option) {
       router.push("/camera");
       return;
     }
@@ -28,14 +32,14 @@ export default function Processing() {
     // Only start generation once using ref to prevent race conditions
     if (!hasStartedGenerationRef.current && !generatedImage) {
       hasStartedGenerationRef.current = true;
-      generateImage(image, 0, endpoint);
+      generateImage(image, 0, option);
     }
   }, [generatedImage, router]);
 
   const generateImage = async (
     imageData: string,
     attempt = 0,
-    endpoint?: string
+    option?: string
   ) => {
     // Prevent multiple simultaneous calls
     if (isLoading) {
@@ -43,10 +47,9 @@ export default function Processing() {
       return;
     }
 
-    const selectedEndpoint =
-      endpoint || localStorage.getItem("selectedEndpoint");
-    if (!selectedEndpoint) {
-      setError("No endpoint selected. Please select a style.");
+    const selectedOption = option || localStorage.getItem("selectedOption");
+    if (!selectedOption) {
+      setError("No option selected. Please select a style.");
       return;
     }
 
@@ -65,7 +68,7 @@ export default function Processing() {
         },
         body: JSON.stringify({
           image: imageData,
-          endpoint: selectedEndpoint,
+          option: selectedOption,
         }),
         signal: controller.signal,
       });
@@ -82,11 +85,13 @@ export default function Processing() {
         throw new Error("No image URL received from server");
       }
       console.log("Received image URL:", data.imageUrl);
+      console.log("Received QR code URL:", data.qrCodeUrl);
       console.log(
         "Current generatedImage state before setting:",
         generatedImage
       );
       setGeneratedImage(data.imageUrl);
+      setQrCode(data.qrCodeUrl);
       console.log("Set generatedImage state to:", data.imageUrl);
     } catch (err) {
       if (err instanceof Error) {
@@ -94,7 +99,7 @@ export default function Processing() {
           if (attempt < 2) {
             setError(`Request timed out. Retrying... (${attempt + 1}/3)`);
             setTimeout(
-              () => generateImage(imageData, attempt + 1, selectedEndpoint),
+              () => generateImage(imageData, attempt + 1, selectedOption),
               2000
             );
             return;
@@ -116,20 +121,41 @@ export default function Processing() {
     router.push("/select-style");
   };
 
-  const handlePrint = async () => {
+  const handlePrint = () => {
+    if (!generatedImage) return;
+    setShowPrintModal(true);
+  };
+
+  const handleConfirmPrint = async () => {
     if (!generatedImage) return;
 
     fetch(generatedImage)
-      .then(res => res.blob())
-      .then(blob => { // convert blob to form data
+      .then((res) => res.blob())
+      .then((blob) => {
+        // convert blob to form data
         const formData = new FormData();
-        formData.append('file', blob, 'generated_image.png');
-        fetch('http://127.0.0.1:5000/print', {
-          method: 'POST',
+        formData.append("file", blob, "generated_image.png");
+        formData.append("copies", printCopies.toString());
+        fetch("http://127.0.0.1:5000/print", {
+          method: "POST",
           body: formData,
         });
-      }); 
+      });
+    setShowPrintModal(false);
     router.push("/thank-you");
+  };
+
+  const handleIncrementCopies = () => {
+    setPrintCopies((prev) => Math.min(prev + 1, 10));
+  };
+
+  const handleDecrementCopies = () => {
+    setPrintCopies((prev) => Math.max(prev - 1, 1));
+  };
+
+  const handleCancelPrint = () => {
+    setShowPrintModal(false);
+    setPrintCopies(1);
   };
 
   return (
@@ -150,8 +176,10 @@ export default function Processing() {
                 <div className="space-y-2">
                   <p className="text-white text-4xl font-medium">
                     {retryCount > 0
-                      ? `Your photo is being processed... (${retryCount + 1}/3)`
-                      : "Your photo is being processed..."}
+                      ? `Your New Year's photo is being created... (${
+                          retryCount + 1
+                        }/3)`
+                      : "Your New Year's photo is being created..."}
                   </p>
                 </div>
               </div>
@@ -171,24 +199,38 @@ export default function Processing() {
               </div>
             </div>
           ) : generatedImage ? (
-            <div className="relative w-full h-full">
-              <img
-                src={generatedImage}
-                alt="AI generated photo"
-                className="w-full h-full object-cover transform -scale-x-100"
-                onError={() => {
-                  console.error(
-                    "Failed to load generated image:",
-                    generatedImage
-                  );
-                  setError(
-                    "Failed to load the generated image. Please try again."
-                  );
-                }}
-                onLoad={() => {
-                  console.log("Generated image loaded successfully");
-                }}
-              />
+            <div className="relative w-full h-full flex flex-col">
+              <div className="flex-1 relative">
+                <img
+                  src={generatedImage}
+                  alt="AI generated photo"
+                  className="w-full h-full object-cover"
+                  onError={() => {
+                    console.error(
+                      "Failed to load generated image:",
+                      generatedImage
+                    );
+                    setError(
+                      "Failed to load the generated image. Please try again."
+                    );
+                  }}
+                  onLoad={() => {
+                    console.log("Generated image loaded successfully");
+                  }}
+                />
+              </div>
+              {qrCode && (
+                <div className="absolute top-4 right-4 bg-white p-3 rounded-xl shadow-lg flex flex-col items-center gap-2">
+                  <img
+                    src={qrCode}
+                    alt="QR Code to download your photo"
+                    className="w-52 h-52"
+                  />
+                  <p className="text-xs font-medium text-gray-700 text-center">
+                    Scan to download
+                  </p>
+                </div>
+              )}
             </div>
           ) : (
             <div className="relative w-full h-full bg-stone-600 flex items-center justify-center">
@@ -228,6 +270,15 @@ export default function Processing() {
           </div>
         )}
       </div>
+
+      <PrintCopiesModal
+        isOpen={showPrintModal}
+        copies={printCopies}
+        onIncrement={handleIncrementCopies}
+        onDecrement={handleDecrementCopies}
+        onConfirm={handleConfirmPrint}
+        onCancel={handleCancelPrint}
+      />
     </div>
   );
 }
