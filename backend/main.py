@@ -8,8 +8,9 @@ from flask import Flask, request, jsonify
 from flask_cors import CORS
 import base64
 from io import BytesIO
-import win32print
-import win32ui
+# import win32print
+# import win32ui
+import boto3
 
 load_dotenv()
 
@@ -19,247 +20,61 @@ client = genai.Client(
 )
 aspect_ratio = "9:16" # "1:1","2:3","3:2","3:4","4:3","4:5","5:4","9:16","16:9","21:9"
 resolution = "1K" # "1K", "2K", "4K"
-
+qrCode = False
 app = Flask(__name__)
 CORS(app)
 
-# THE ENDPOINTS FOR IMAGE GENERATION
-@app.route('/image-generator-pottery', methods=['POST'])
+options = {
+    "ghibli": {
+        "prompt": """
+        Create a full-body shot of the person(s) in the provided photo in a semi-realisticStudio Ghibli style.
+        Set the background to AlUla mountains which is provided as a reference image, it should be night time, with stars visible.
+        """,
+        "reference_images": [Image.open("./references/alula_mountains.png")]
+    },
+    "option2": {}
+}
+
+# THE ENDPOINTS FOR IMAGE GENERATION - should receive an option parameter
+@app.route('/image-generator', methods=['POST'])
 def generate_image_pottery_route():
     data = request.json
+    option = data.get('option')
     image_base64 = data.get('image')
     # Convert base64 to PIL Image
     input_image = base64_to_image(image_base64)
 
-    prompt = (
-        """
-        Transform the person(s) in the input image into a highly photorealistic scene.
-
-        Identity:
-        Preserve exact facial features, face structure, skin tone, and identity.
-        This must remain the same real person(s). Do NOT alter facial identity.
-
-        Selected Craft (MANDATORY):
-        Traditional pottery (الفخار)
-
-        The image must clearly depict ONLY this craft.
-
-        Scene:
-        Depict a historic Saudi village or traditional workshop environment that matches the selected craft.
-        Use authentic tools and materials only.
-
-        Clothing:
-        Preserve the original clothing as closely as possible.
-        If exact preservation conflicts with realism or the selected craft activity,
-        make the smallest possible adjustment while maintaining modesty and authenticity.
-        Do NOT stylize or modernize clothing.
-
-        Theme:
-        عام الحرف اليدوية (Year of Handicrafts)
-
-        Lighting:
-        Natural warm daylight with realistic shadows.
-
-        Style:
-        Ultra-photorealistic, professional DSLR photography.
-        Shallow depth of field, cinematic realism."""
-    )
-    output_image = generate_image_function(prompt, input_image)
+    
+    
+    output_image = generate_image_function(option, input_image)
     # Convert PIL Image back to base64
     output_base64 = image_to_base64(output_image)
     return jsonify({'image': output_base64})
 
 # ------------------------------------------------------------
-
-@app.route('/image-generator-ghibli', methods=['POST'])
-def generate_image_ghibli_route():
-    data = request.json
-    image_base64 = data.get('image')
-    # Convert base64 to PIL Image
-    input_image = base64_to_image(image_base64)
-
-    prompt = (
-        """
-        Transform the person(s) in the input image into a Ghibli-style anime character.
-
-        Identity:
-        Preserve exact facial features, face structure, skin tone, and identity.
-        This must remain the same real person(s). Do NOT alter facial identity.
-
-        Scene:
-        Background of AlUla Elephant Rock (Jabal AlFil) in Saudi Arabia, 
-
-        Clothing:
-        Preserve the original clothing as closely as possible.
-        If exact preservation conflicts with realism or the anime character activity,
-        make the smallest possible adjustment while maintaining modesty and authenticity.
-        Do NOT stylize or modernize clothing.
-
-        Theme:
-        عام الحرف اليدوية (Year of Handicrafts)
-
-        """
-    )
-    output_image = generate_image_function(prompt, input_image)
-    # Convert PIL Image back to base64
-    output_base64 = image_to_base64(output_image)
-    return jsonify({'image': output_base64})
-
-# ------------------------------------------------------------
-
-@app.route('/image-generator-palm-craft', methods=['POST'])
-def generate_image_palm_craft_route():
-    data = request.json
-    image_base64 = data.get('image')
-    # Convert base64 to PIL Image
-    input_image = base64_to_image(image_base64)
-
-    prompt = (
-        """
-        Transform the person(s) in the input image into a highly photorealistic scene.
-
-        Identity:
-        Preserve exact facial features, face structure, skin tone, and identity.
-        This must remain the same real person(s). Do NOT alter facial identity.
-
-        Selected Craft (MANDATORY):
-        Palm leaf weaving (الخوص)
-
-        The image must clearly depict ONLY this craft.
-
-        Scene:
-        Depict a historic Saudi village or traditional workshop environment that matches the selected craft.
-        Use authentic tools and materials only.
-
-        Clothing:
-        Preserve the original clothing as closely as possible.
-        If exact preservation conflicts with realism or the selected craft activity,
-        make the smallest possible adjustment while maintaining modesty and authenticity.
-        Do NOT stylize or modernize clothing.
-
-        Theme:
-        عام الحرف اليدوية (Year of Handicrafts)
-
-        Lighting:
-        Natural warm daylight with realistic shadows.
-
-        Style:
-        Ultra-photorealistic, professional DSLR photography.
-        Shallow depth of field, cinematic realism."""
-    )
-    output_image = generate_image_function(prompt, input_image)
-    # Convert PIL Image back to base64
-    output_base64 = image_to_base64(output_image)
-    return jsonify({'image': output_base64})
-
-# ------------------------------------------------------------
-
-@app.route('/image-generator-realistic', methods=['POST'])
-def generate_image_realistic_route():
-    data = request.json
-    image_base64 = data.get('image')
-    # Convert base64 to PIL Image
-    input_image = base64_to_image(image_base64)
-
-    prompt = (
-        """
-        put the person(s) in a scene with a background of the famous Jabal AlFil in AlUla, Saudi Arabia.
-        """
-    )
-    output_image = generate_image_function(prompt, input_image)
-    # Convert PIL Image back to base64
-    output_base64 = image_to_base64(output_image)
-    return jsonify({'image': output_base64})
-
-# ------------------------------------------------------------
-
-@app.route('/image-generator-embroidery', methods=['POST'])
-def generate_image_embroidery_route():
-    data = request.json
-    image_base64 = data.get('image')
-    # Convert base64 to PIL Image
-    input_image = base64_to_image(image_base64)
-
-    prompt = (
-        """
-        Transform the person(s) in the input image into a highly photorealistic scene.
-
-        Identity:
-        Preserve exact facial features, face structure, skin tone, and identity.
-        This must remain the same real person(s). Do NOT alter facial identity.
-
-        Selected Craft (MANDATORY):
-        Traditional embroidery (الطرز)
-
-        The image must clearly depict ONLY this craft.
-
-        Scene:
-        Depict a historic Saudi village or traditional workshop environment that matches the selected craft.
-        Use authentic tools and materials only, similar to the reference image.
-
-        Clothing:
-        Preserve the original clothing as closely as possible.
-        If exact preservation conflicts with realism or the selected craft activity,
-        make the smallest possible adjustment while maintaining modesty and authenticity.
-        Do NOT stylize or modernize clothing.
-
-        Theme:
-        عام الحرف اليدوية (Year of Handicrafts)
-
-        Lighting:
-        Natural warm daylight with realistic shadows.
-
-        Style:
-        Ultra-photorealistic, professional DSLR photography.
-        Shallow depth of field, cinematic realism."""
-    )
-    output_image = generate_image_function_reference(prompt, input_image)
-    # Convert PIL Image back to base64
-    output_base64 = image_to_base64(output_image)
-    return jsonify({'image': output_base64})
-
-def generate_image_function_reference(prompt: str, image: Image.Image) -> Image.Image:
-    start_time = time.time()
-    response = client.models.generate_content(
-    model="gemini-3-pro-image-preview",
-    contents=[
-        prompt,
-        image,
-        Image.open("./references/embroidery.jpg")
-    ],
-    config=types.GenerateContentConfig(
-        response_modalities=['IMAGE'],
-        image_config=types.ImageConfig(
-            aspect_ratio=aspect_ratio,
-            image_size=resolution
-            ),
-        )
-    )
-
-    result_image = None
-    for part in response.parts:
-        if part.text is not None:
-            print(part.text)
-        elif part.inline_data is not None:
-            # Get raw image bytes from the response
-            image_bytes = part.inline_data.data
-            result_image = Image.open(BytesIO(image_bytes))
-    end_time = time.time()
-    print(f"Time taken: {end_time - start_time} seconds")
-    return result_image
-
 
 # generate image FUNCTION
-def generate_image_function(prompt: str, image: Image.Image) -> Image.Image:
+def generate_image_function(option: str, image: Image.Image) -> Image.Image:
     start_time = time.time()
+    # check if option is valid
+    if option not in options:
+        return jsonify({'error': 'Invalid option'}), 400
+
+    # check if option has reference images - if yes add them to contents
+    contents = [
+        options[option]['prompt'],
+        image,
+    ]
+
+    if 'reference_images' in options[option]:
+        for img in options[option]['reference_images']:
+            contents.append(img)
+    
     response = client.models.generate_content(
     model="gemini-3-pro-image-preview",
-    contents=[
-        prompt,
-        image,
-    ],
+    contents=contents,
     config=types.GenerateContentConfig(
-        response_modalities=['IMAGE'],
+        response_modalities=['IMAGE', 'TEXT'],
         image_config=types.ImageConfig(
             aspect_ratio=aspect_ratio,
             image_size=resolution

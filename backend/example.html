@@ -372,6 +372,45 @@
             color: var(--gold);
         }
 
+        .style-selector {
+            margin-bottom: 1rem;
+        }
+
+        .style-selector label {
+            display: block;
+            color: var(--sand);
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+        }
+
+        .style-selector select {
+            width: 100%;
+            padding: 0.8rem 1rem;
+            font-family: 'Outfit', sans-serif;
+            font-size: 0.95rem;
+            color: var(--cream);
+            background: rgba(0,0,0,0.4);
+            border: 1px solid rgba(212, 165, 116, 0.4);
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .style-selector select:hover {
+            border-color: var(--gold);
+        }
+
+        .style-selector select:focus {
+            outline: none;
+            border-color: var(--gold);
+            box-shadow: 0 0 10px rgba(201, 162, 39, 0.2);
+        }
+
+        .style-selector select option {
+            background: var(--deep-brown);
+            color: var(--cream);
+        }
+
         @media (max-width: 768px) {
             .container {
                 grid-template-columns: 1fr;
@@ -392,6 +431,17 @@
     <div class="container">
         <div class="panel">
             <h2 class="panel-title">Capture Your Image</h2>
+            
+            <div class="style-selector">
+                <label for="styleSelect">Select Style:</label>
+                <select id="styleSelect">
+                    <option value="pottery">Pottery (الفخار)</option>
+                    <option value="palm-craft">Palm leaf weaving (الخوص)</option>
+                    <option value="embroidery">Traditional embroidery (الطرز)</option>
+                    <option value="ghibli">Ghibli style (غبلي)</option>
+                    <option value="realistic">Realistic style (واقعي)</option>
+                </select>
+            </div>
             
             <div class="input-toggle">
                 <button class="toggle-btn active" id="cameraToggle">📷 Camera</button>
@@ -420,7 +470,7 @@
             </div>
             
             <button class="generate-btn" id="generateBtn" disabled>
-                Generate Pottery Scene
+                Generate Image
             </button>
             
             <div class="error-msg" id="errorMsg"></div>
@@ -458,6 +508,7 @@
         const placeholder = document.getElementById('placeholder');
         const errorMsg = document.getElementById('errorMsg');
         const printBtn = document.getElementById('printBtn');
+        const styleSelect = document.getElementById('styleSelect');
         
         // Upload elements
         const cameraToggle = document.getElementById('cameraToggle');
@@ -621,13 +672,16 @@
             if (existingImg) existingImg.remove();
 
             try {
-                const response = await fetch('http://127.0.0.1:5000/image-generator-embroidery', {
+                const selectedOption = styleSelect.value;
+                
+                const response = await fetch('http://127.0.0.1:5000/image-generator', {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
                     },
                     body: JSON.stringify({
-                        image: imageBase64
+                        image: imageBase64,
+                        option: selectedOption
                     })
                 });
 

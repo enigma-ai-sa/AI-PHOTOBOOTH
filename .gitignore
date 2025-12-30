@@ -3,21 +3,21 @@
 ./.env
 
 # engima-photobooth (Next.js)
-engima-photobooth/node_modules/
-engima-photobooth/.next/
-engima-photobooth/out/
-engima-photobooth/build/
-engima-photobooth/tsconfig.tsbuildinfo
-engima-photobooth/.env.local
-engima-photobooth/.env.development.local
-engima-photobooth/.env.production.local
-engima-photobooth/.env.test.local
+frontend/node_modules/
+frontend/.next/
+frontend/out/
+frontend/build/
+frontend/tsconfig.tsbuildinfo
+frontend/.env.local
+frontend/.env.development.local
+frontend/.env.production.local
+frontend/.env.test.local
 
 # System files
 .DS_Store
 
 # IDE/Editor
-engima-photobooth/.vscode/
-engima-photobooth/.idea/
-engima-photobooth/*.swp
-engima-photobooth/*.swo
+frontend/.vscode/
+frontend/.idea/
+frontend/*.swp
+frontend/*.swo

@@ -3,4 +3,5 @@ Pillow
 python-dotenv
 flask
 flask-cors
-pywin32
+# pywin32
+boto3
