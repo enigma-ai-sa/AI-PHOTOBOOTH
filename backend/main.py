@@ -8,8 +8,8 @@ from flask import Flask, request, jsonify
 from flask_cors import CORS
 import base64
 from io import BytesIO
-# import win32print
-# import win32ui
+import win32print
+import win32ui
 import boto3
 import qrcode
 
