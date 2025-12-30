@@ -278,6 +278,44 @@
             cursor: not-allowed;
         }
 
+        .qr-container {
+            display: none;
+            margin-top: 1.5rem;
+            text-align: center;
+            padding: 1.5rem;
+            background: rgba(255, 255, 255, 0.95);
+            border-radius: 12px;
+            border: 1px solid rgba(212, 165, 116, 0.3);
+        }
+
+        .qr-container.active {
+            display: block;
+        }
+
+        .qr-container img {
+            width: 150px;
+            height: 150px;
+            border-radius: 8px;
+        }
+
+        .qr-container p {
+            color: var(--deep-brown);
+            font-size: 0.85rem;
+            margin-top: 0.75rem;
+            font-weight: 500;
+        }
+
+        .qr-container a {
+            color: var(--terracotta);
+            text-decoration: none;
+            font-size: 0.75rem;
+            word-break: break-all;
+        }
+
+        .qr-container a:hover {
+            text-decoration: underline;
+        }
+
         .camera-container {
             position: relative;
             border-radius: 12px;
@@ -489,6 +527,12 @@
             <button class="print-btn" id="printBtn">
                 🖨️ Print Image
             </button>
+
+            <div class="qr-container" id="qrContainer">
+                <img id="qrCodeImage" src="" alt="QR Code">
+                <p>Scan to download your image</p>
+                <a id="s3Link" href="" target="_blank"></a>
+            </div>
         </div>
     </div>
 
@@ -508,6 +552,9 @@
         const errorMsg = document.getElementById('errorMsg');
         const printBtn = document.getElementById('printBtn');
         const styleSelect = document.getElementById('styleSelect');
+        const qrContainer = document.getElementById('qrContainer');
+        const qrCodeImage = document.getElementById('qrCodeImage');
+        const s3Link = document.getElementById('s3Link');
         
         // Upload elements
         const cameraToggle = document.getElementById('cameraToggle');
@@ -665,6 +712,7 @@
             loading.classList.add('active');
             placeholder.style.display = 'none';
             printBtn.classList.remove('active');
+            qrContainer.classList.remove('active');
             hideError();
 
             const existingImg = resultContainer.querySelector('img');
@@ -701,6 +749,21 @@
                     resultContainer.appendChild(resultImg);
                     
                     printBtn.classList.add('active');
+
+                    // Display QR code if available
+                    if (data.qrCode) {
+                        const qrCodeSrc = data.qrCode.startsWith('data:') 
+                            ? data.qrCode 
+                            : `data:image/png;base64,${data.qrCode}`;
+                        qrCodeImage.src = qrCodeSrc;
+                        qrContainer.classList.add('active');
+                        
+                        // Set the S3 link if available
+                        if (data.s3Url) {
+                            s3Link.href = data.s3Url;
+                            s3Link.textContent = data.s3Url;
+                        }
+                    }
                 } else {
                     throw new Error('No image in response');
                 }

@@ -11,8 +11,19 @@ from io import BytesIO
 # import win32print
 # import win32ui
 import boto3
+import qrcode
 
 load_dotenv()
+
+# s3 bucket
+s3 = boto3.client(
+    "s3",
+    aws_access_key_id=os.getenv("AWS_ACCESS_KEY_ID"),
+    aws_secret_access_key=os.getenv("AWS_SECRET_ACCESS_KEY"),
+    region_name=os.getenv("S3_REGION")
+)
+
+key = "/images/new_years"
 
 # GLOBAL VARIABLES
 client = genai.Client(
@@ -20,9 +31,13 @@ client = genai.Client(
 )
 aspect_ratio = "9:16" # "1:1","2:3","3:2","3:4","4:3","4:5","5:4","9:16","16:9","21:9"
 resolution = "1K" # "1K", "2K", "4K"
-qrCode = False
+qrCode = True
+
 app = Flask(__name__)
-CORS(app, resources={r"/*": {"origins": "*"}})
+CORS(app, resources={r"/*": 
+    {"origins": "*",
+    "methods": ["GET", "POST"],
+    "allow_headers": ["Content-Type"]}})
 
 options = {
     "ghibli": {
@@ -62,12 +77,32 @@ def generate_image_pottery_route():
     image_base64 = data.get('image')
     # Convert base64 to PIL Image
     input_image = base64_to_image(image_base64)
-
-    
-    
     output_image = generate_image_function(option, input_image)
     # Convert PIL Image back to base64
     output_base64 = image_to_base64(output_image)
+    if qrCode:
+        bucket_name = os.getenv('S3_BUCKET_NAME')
+        region = os.getenv('S3_REGION')
+        # Convert base64 back to bytes for S3
+        image_bytes = base64.b64decode(output_base64)
+        # Create a unique filename with timestamp
+        filename = f"images/new_years/{int(time.time())}.png"
+        s3.put_object(
+            Bucket=os.getenv('S3_BUCKET_NAME'),
+            Key=filename,
+            Body= image_bytes,
+            ContentType="image/png",
+            ContentDisposition="inline"
+        )
+
+        # Construct the S3 URL
+        s3_url = f"https://{bucket_name}.s3.{region}.amazonaws.com/{filename}"
+        print(f"Image uploaded to S3: {s3_url}")
+
+        # Generate QR code with the S3 URL
+        qr_code_base64 = generate_qr_code(s3_url)
+        return jsonify({'image': output_base64, "qrCode" : qr_code_base64})
+
     return jsonify({'image': output_base64})
 
 # ------------------------------------------------------------
@@ -127,6 +162,26 @@ def image_to_base64(image: Image.Image) -> str:
     """Convert PIL Image to base64 string"""
     buffered = BytesIO()
     image.save(buffered, format="PNG")
+    return base64.b64encode(buffered.getvalue()).decode('utf-8')
+
+
+# ------------------------ QR CODE GENERATION --------------------------------
+def generate_qr_code(url: str) -> str:
+    """Generate a QR code image from URL and return as base64 string"""
+    qr = qrcode.QRCode(
+        version=1,
+        error_correction=qrcode.constants.ERROR_CORRECT_L,
+        box_size=10,
+        border=4,
+    )
+    qr.add_data(url)
+    qr.make(fit=True)
+    
+    qr_image = qr.make_image(fill_color="black", back_color="white")
+    
+    # Convert to base64
+    buffered = BytesIO()
+    qr_image.save(buffered, format="PNG")
     return base64.b64encode(buffered.getvalue()).decode('utf-8')
 
 # ------------------------ PRINTING --------------------------------

@@ -5,3 +5,4 @@ flask
 flask-cors
 # pywin32
 boto3
+qrcode
