@@ -32,7 +32,12 @@ options = {
         """,
         "reference_images": [Image.open("./references/alula_mountains.png")]
     },
-    "option2": {}
+    "studio": {
+        "prompt": """
+        Take the person(s) from the provided image and generate a Studio Portrait a blurred background of sparkles.
+        Ensure the person(s)' face and features remain completely unchanged. Keep the face untouched.
+        """
+    }
 }
 
 # THE ENDPOINTS FOR IMAGE GENERATION - should receive an option parameter
