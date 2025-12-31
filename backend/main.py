@@ -29,7 +29,7 @@ key = "/images/new_years"
 client = genai.Client(
     api_key=os.getenv('GEMINI_API_KEY'),
 )
-aspect_ratio = "9:16" # "1:1","2:3","3:2","3:4","4:3","4:5","5:4","9:16","16:9","21:9"
+aspect_ratio = "3:2" # "1:1","2:3","3:2","3:4","4:3","4:5","5:4","9:16","16:9","21:9"
 resolution = "1K" # "1K", "2K", "4K"
 qrCode = True
 
