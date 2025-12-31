@@ -206,38 +206,76 @@ export default function Processing() {
               </div>
             </div>
           ) : generatedImage ? (
-            <div className="relative w-full h-full flex flex-col">
-              <div className="flex-1 relative">
-                <img
-                  src={generatedImage}
-                  alt="AI generated photo"
-                  className="w-full h-full object-cover"
-                  onError={() => {
-                    console.error(
-                      "Failed to load generated image:",
-                      generatedImage
-                    );
-                    setError(
-                      "Failed to load the generated image. Please try again."
-                    );
-                  }}
-                  onLoad={() => {
-                    console.log("Generated image loaded successfully");
-                  }}
-                />
-              </div>
+            <div className="w-full h-full flex flex-col p-6 relative">
+              {/* QR Code Section - Top Right Corner */}
               {qrCode && (
-                <div className="absolute top-4 right-4 bg-white p-3 rounded-xl shadow-lg flex flex-col items-center gap-2">
-                  <img
-                    src={qrCode}
-                    alt="QR Code to download your photo"
-                    className="w-52 h-52"
-                  />
-                  <p className="text-xs font-medium text-gray-700 text-center">
-                    Scan to download
-                  </p>
+                <div className="absolute top-0 right-4 z-10">
+                  <div className="bg-white rounded-xl shadow-lg flex flex-col items-center gap-2">
+                    <img
+                      src={qrCode}
+                      alt="QR Code to download your photo"
+                      className="w-64 h-64"
+                    />
+                    <p className="text-sm font-medium text-gray-700 text-center">
+                      Scan to download
+                    </p>
+                  </div>
                 </div>
               )}
+
+              {/* Image Section - Centered */}
+              <div className="flex-1 flex items-center justify-center min-h-0">
+                {/* Image Section - 3:2 Aspect Ratio */}
+                <div className="w-full max-w-6xl aspect-[3/2] rounded-xl overflow-hidden">
+                  <img
+                    src={generatedImage}
+                    alt="AI generated photo"
+                    className="w-full h-full object-cover"
+                    onError={() => {
+                      console.error(
+                        "Failed to load generated image:",
+                        generatedImage
+                      );
+                      setError(
+                        "Failed to load the generated image. Please try again."
+                      );
+                    }}
+                    onLoad={() => {
+                      console.log("Generated image loaded successfully");
+                    }}
+                  />
+                </div>
+              </div>
+
+              {/* Buttons Section - White Background - At Bottom */}
+              <div className="bg-white py-10 px-6 rounded-3xl space-y-4 shadow-md mt-6">
+                <p className="text-3xl font-normal text-center">
+                  <span className="text-black">Powered by </span>
+                  <span className="bg-gradient-to-r from-primary-purple-500 via-primary-light-blue-500 to-accent-green-500 bg-clip-text text-transparent font-medium">
+                    enigma
+                  </span>
+                </p>
+                <div className="grid grid-cols-2 gap-4">
+                  <Button
+                    onClick={handleStartOver}
+                    variant="tertiary"
+                    size="large"
+                    className="gap-4"
+                  >
+                    <IoRefreshOutline />
+                    Retake
+                  </Button>
+                  <Button
+                    onClick={handlePrint}
+                    variant="primary"
+                    size="large"
+                    className="gap-4"
+                  >
+                    <IoPrint />
+                    Print Photo
+                  </Button>
+                </div>
+              </div>
             </div>
           ) : (
             <div className="relative w-full h-full bg-stone-600 flex items-center justify-center">
@@ -245,37 +283,6 @@ export default function Processing() {
             </div>
           )}
         </div>
-
-        {generatedImage && (
-          <div className="absolute bottom-8 left-8 right-8 z-10 space-y-4 bg-gradient-to-t from-black/30 via-black/10 to-transparent py-10 px-6 rounded-3xl backdrop-blur-sm bg-white/90">
-            <p className="text-3xl font-normal text-center">
-              <span className="text-black">Powered by </span>
-              <span className="bg-gradient-to-r from-primary-purple-500 via-primary-light-blue-500 to-accent-green-500 bg-clip-text text-transparent font-medium">
-                enigma
-              </span>
-            </p>
-            <div className="grid grid-cols-2 gap-4">
-              <Button
-                onClick={handleStartOver}
-                variant="tertiary"
-                size="large"
-                className="gap-4"
-              >
-                <IoRefreshOutline />
-                Retake
-              </Button>
-              <Button
-                onClick={handlePrint}
-                variant="primary"
-                size="large"
-                className="gap-4"
-              >
-                <IoPrint />
-                Print Photo
-              </Button>
-            </div>
-          </div>
-        )}
       </div>
 
       <PrintCopiesModal
