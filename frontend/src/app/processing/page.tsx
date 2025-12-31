@@ -129,18 +129,25 @@ export default function Processing() {
   const handleConfirmPrint = async () => {
     if (!generatedImage) return;
 
-    fetch(generatedImage)
-      .then((res) => res.blob())
-      .then((blob) => {
-        // convert blob to form data
+    try {
+      // Fetch the image once
+      const response = await fetch(generatedImage);
+      const blob = await response.blob();
+
+      // Print multiple copies by making multiple API calls
+      for (let i = 0; i < printCopies; i++) {
         const formData = new FormData();
         formData.append("file", blob, "generated_image.png");
-        formData.append("copies", printCopies.toString());
-        fetch("http://127.0.0.1:5000/print", {
+
+        await fetch("http://127.0.0.1:5000/print", {
           method: "POST",
           body: formData,
         });
-      });
+      }
+    } catch (error) {
+      console.error("Print failed:", error);
+    }
+
     setShowPrintModal(false);
     router.push("/thank-you");
   };
