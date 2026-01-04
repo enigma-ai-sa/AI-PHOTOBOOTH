@@ -5,6 +5,7 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { FiCheck, FiRefreshCw } from "react-icons/fi";
+import Logo from "@/components/Logo";
 
 export default function Preview() {
   const router = useRouter();
@@ -45,38 +46,50 @@ export default function Preview() {
   }
 
   return (
-    <div className="h-screen bg-white p-8 overflow-hidden flex w-full flex-col">
-      {/* Image container - centered */}
-      <div className="relative w-full max-w-6xl mx-auto flex-1 flex items-center justify-center">
-        <div className="rounded-3xl overflow-hidden border-4 border-gradient-blue-end w-full aspect-[3/2] relative">
-          <Image
-            src={capturedImage}
-            alt="Captured photo"
-            fill
-            className="object-cover transform -scale-x-100"
-            unoptimized
-          />
+    <div className="h-dvh p-4 md:p-8 !pt-0 bg-forest-green bg-[url('/patterns/background.svg')] bg-repeat-round">
+      <div className="w-full h-full py-6 rounded-2xl flex flex-col">
+        {/* Logo */}
+        <div className="flex justify-end pb-10">
+          <Logo width={150} height={80} className="" />
         </div>
-      </div>
 
-      {/* Bottom controls - outside image container */}
-      <div className="w-full max-w-6xl mx-auto grid grid-cols-2 gap-4 py-6 px-6">
-        <Button
-          onClick={handleRetake}
-          variant="tertiary"
-          size="large"
-          className="gap-6"
-        >
-          <FiRefreshCw size={50} /> Retake
-        </Button>
-        <Button
-          onClick={handleGenerate}
-          variant="primary"
-          size="large"
-          className="gap-6"
-        >
-          <FiCheck size={50} /> Generate
-        </Button>
+        {/* Main Content Area */}
+        <div className="flex-1 flex flex-col gap-6 min-h-0 ">
+          {/* Image container - centered */}
+          <div className="relative w-full flex-1 flex items-center justify-center">
+            <div className="rounded-[50px] overflow-hidden border-[15px] border-gold w-full h-full relative">
+              <Image
+                src={capturedImage}
+                alt="Captured photo"
+                fill
+                className="object-cover transform -scale-x-100"
+                unoptimized
+              />
+            </div>
+          </div>
+
+          {/* Bottom controls - outside image container */}
+          <div className="w-full grid grid-cols-2 gap-4 py-6 px-6 flex-shrink-0">
+            <Button
+              onClick={handleRetake}
+              variant="tertiary"
+              size="large"
+              className="gap-6"
+            >
+              إعادة المحاولة
+              <FiRefreshCw size={50} />
+            </Button>
+            <Button
+              onClick={handleGenerate}
+              variant="primary"
+              size="large"
+              className="gap-6"
+            >
+              تأكيد
+              <FiCheck size={50} />
+            </Button>
+          </div>
+        </div>
       </div>
     </div>
   );

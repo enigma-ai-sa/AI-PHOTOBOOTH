@@ -19,15 +19,15 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     ref
   ) => {
     const baseStyles =
-      "font-bold rounded-3xl transition-all duration-200 flex items-center justify-center font-normal overflow-hidden";
+      "font-bold rounded-3xl transition-all duration-200 flex items-center justify-center overflow-hidden";
 
     const variantStyles = {
       primary:
-        "bg-gradient-blue text-white disabled:cursor-not-allowed disabled:hover:scale-100",
+        "bg-cream text-forest-green disabled:cursor-not-allowed disabled:hover:scale-100 border-4 border-gold !rounded-full",
       secondary:
         "bg-white text-primary-purple-500 hover:bg-opacity-90 hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100",
       tertiary:
-        "bg-white bg-opacity-20 text-gradient-blue-end border-2 border-gradient-blue-end disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100",
+        "bg-transparent border-4 border-cream text-cream !rounded-full disabled:cursor-not-allowed ",
     };
 
     const sizeStyles = {

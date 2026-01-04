@@ -2,9 +2,10 @@
 
 import { useRouter } from "next/navigation";
 import { useCallback, useRef, useState } from "react";
-import { BiArrowBack } from "react-icons/bi";
 import { IoCameraOutline } from "react-icons/io5";
+import { LuArrowLeft } from "react-icons/lu";
 import Webcam from "react-webcam";
+import Logo from "@/components/Logo";
 
 export default function Camera() {
   const webcamRef = useRef<Webcam>(null);
@@ -109,50 +110,66 @@ export default function Camera() {
     aspectRatio: 3 / 2, // Canon EOS R50 photo aspect ratio
   };
 
-  
   return (
-    <div className="h-screen bg-white p-8 overflow-hidden flex w-full flex-col">
-      {/* Camera container - centered */}
-      <div className="relative w-full max-w-6xl mx-auto flex-1 flex items-center justify-center">
-        <div className="rounded-3xl overflow-hidden border-4 border-gradient-blue-end w-full aspect-[3/2] relative">
-          <Webcam
-            audio={false}
-            ref={webcamRef}
-            screenshotFormat="image/png"
-            videoConstraints={videoConstraints}
-            className="w-full h-full object-cover transform -scale-x-100 rounded-3xl overflow-hidden bg-stone-600"
-          />
-
-          {isCountingDown && (
-            <div className="absolute inset-0 flex items-center justify-center">
-              <div className="bg-gradient-blue-end animate-pulse border-gradieny-blue-endborder-14 border-bg-opacity-50 rounded-full w-62 h-62 flex items-center justify-center">
-                <div className="text-9xl font-bold text-white">
-                  {countdownNumber}
-                </div>
-              </div>
-            </div>
-          )}
-
-          {isCapturing && (
-            <div className="absolute inset-0 bg-white opacity-80 rounded-3xl flex items-center justify-center">
-              <div className="text-2xl font-bold text-purple-800">Captured!</div>
-            </div>
-          )}
+    <div className="h-dvh p-4 md:p-8 !pt-0 bg-forest-green bg-[url('/patterns/background.svg')] bg-repeat-round">
+      <div className="w-full h-full py-6 rounded-2xl flex flex-col">
+        {/* Logo */}
+        <div className="flex justify-end">
+          <Logo width={150} height={80} className="" />
         </div>
-      </div>
 
-      {/* Bottom controls - outside camera container */}
-      <div className="w-full max-w-6xl mx-auto grid grid-cols-3 gap-4 py-6 px-6">
-        <button
-          onClick={() => router.push("/select-style")}
-          className="text-gradient-blue-end text-5xl font-normal flex items-center gap-6"
-        >
-          <BiArrowBack /> Back
-        </button>
-        <button className="bg-gradient-blue-end rounded-full p-8 text-white w-fit mx-auto">
-          <IoCameraOutline size={90} onClick={startCountdown} />
-        </button>
-        <div></div> {/* Empty div to maintain grid spacing */}
+        {/* Main Content Area */}
+        <div className="flex-1 flex flex-col gap-6 min-h-0">
+          {/* Title */}
+          <h2 className="text-8xl text-cream font-medium text-center py-10">
+            جاهز للتصوير؟ 😄
+          </h2>
+
+          {/* Camera container - centered */}
+          <div className="relative w-full flex-1 flex items-center justify-center">
+            <div className="rounded-[50px] overflow-hidden border-[15px] border-gold w-full h-full relative">
+              <Webcam
+                audio={false}
+                ref={webcamRef}
+                screenshotFormat="image/png"
+                videoConstraints={videoConstraints}
+                className="w-full h-full object-cover transform -scale-x-100 rounded-[50px] overflow-hidden bg-stone-600"
+              />
+
+              {isCountingDown && (
+                <div className="absolute inset-0 flex items-center justify-center">
+                  <div className="bg-gold animate-pulse border-8 border-cream rounded-full w-62 h-62 flex items-center justify-center">
+                    <div className="text-9xl font-bold text-forest-green leading-none">
+                      {countdownNumber}
+                    </div>
+                  </div>
+                </div>
+              )}
+
+              {isCapturing && (
+                <div className="absolute inset-0 bg-gold opacity-80 rounded-[50px] flex items-center justify-center">
+                  <div className="text-2xl font-bold text-forest-green">
+                    Captured!
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Bottom controls - outside camera container */}
+          <div className="w-full grid grid-cols-3 gap-4 py-6 px-6 flex-shrink-0">
+            <button
+              onClick={() => router.push("/select-style")}
+              className="text-cream text-5xl font-normal flex items-center gap-6"
+            >
+              <LuArrowLeft /> رجوع
+            </button>
+            <button className="bg-gold rounded-full p-8 text-forest-green w-fit mx-auto">
+              <IoCameraOutline size={90} onClick={startCountdown} />
+            </button>
+            <div></div> {/* Empty div to maintain grid spacing */}
+          </div>
+        </div>
       </div>
     </div>
   );

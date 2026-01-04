@@ -5,6 +5,7 @@ import PrintCopiesModal from "@/components/PrintCopiesModal";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { IoPrint, IoRefreshOutline } from "react-icons/io5";
+import Logo from "@/components/Logo";
 
 export default function Processing() {
   const [capturedImage, setCapturedImage] = useState<string | null>(null);
@@ -166,27 +167,32 @@ export default function Processing() {
   };
 
   return (
-    <div className="h-screen bg-white p-8 overflow-hidden flex w-full flex-col">
-      <div className="relative w-full h-full mx-auto flex-1 flex flex-col">
-        <div className="rounded-3xl overflow-hidden border-4 border-gradient-blue-end w-full flex-1">
+    <div className="h-dvh p-4 md:p-8 !pt-0 bg-forest-green bg-[url('/patterns/background.svg')] bg-repeat-round">
+      <div className="w-full h-full py-6 rounded-2xl flex flex-col">
+        {/* Logo */}
+        <div className="flex justify-end pb-10">
+          <Logo width={150} height={80} className="" />
+        </div>
+
+        {/* Main Content Area */}
+        <div className="flex-1 flex flex-col min-h-0">
+          <div className="rounded-[50px] overflow-hidden border-[15px] border-gold w-full flex-1">
           {isLoading ? (
             <div className="relative w-full h-full bg-stone-600 flex items-center justify-center overflow-hidden">
               {/* Main loading content */}
               <div className="text-center z-10">
                 <div className="mb-6">
                   <div className="inline-block relative">
-                    <div className="w-45 h-45 border-15 border-white border-t-gray-400 border-r-gray-400 rounded-full animate-spin"></div>
-                    <div className="absolute inset-0 w-45 h-45 border-15 border-transparent border-r-white rounded-full animate-spin animation-delay-150"></div>
+                    <div className="w-45 h-45 border-15 border-gold border-t-cream border-r-cream rounded-full animate-spin"></div>
+                    <div className="absolute inset-0 w-45 h-45 border-15 border-transparent border-r-gold rounded-full animate-spin animation-delay-150"></div>
                   </div>
                 </div>
 
                 <div className="space-y-2">
-                  <p className="text-white text-4xl font-medium">
+                  <p className="text-cream text-4xl font-medium">
                     {retryCount > 0
-                      ? `Your New Year's photo is being created... (${
-                          retryCount + 1
-                        }/3)`
-                      : "Your New Year's photo is being created..."}
+                      ? `جارٍ إنشاء صورتك... (${retryCount + 1}/3)`
+                      : "جارٍ إنشاء صورتك..."}
                   </p>
                 </div>
               </div>
@@ -194,14 +200,14 @@ export default function Processing() {
           ) : error ? (
             <div className="relative w-full h-full bg-stone-600 flex items-center justify-center p-4 mx-auto">
               <div className="text-center mx-auto">
-                <p className="text-red-400 mb-4 text-2xl">{error}</p>
+                <p className="text-cream mb-4 text-2xl">{error}</p>
                 <Button
                   onClick={() => generateImage(capturedImage!, 0)}
                   variant="primary"
                   size="medium"
                   disabled={isLoading}
                 >
-                  {isLoading ? "Retrying..." : "Retry"}
+                  {isLoading ? "جارٍ إعادة المحاولة..." : "إعادة المحاولة"}
                 </Button>
               </div>
             </div>
@@ -262,8 +268,8 @@ export default function Processing() {
                     size="large"
                     className="gap-4"
                   >
+                    إعادة المحاولة
                     <IoRefreshOutline />
-                    Retake
                   </Button>
                   <Button
                     onClick={handlePrint}
@@ -271,17 +277,18 @@ export default function Processing() {
                     size="large"
                     className="gap-4"
                   >
+                    طباعة الصورة
                     <IoPrint />
-                    Print Photo
                   </Button>
                 </div>
               </div>
             </div>
           ) : (
             <div className="relative w-full h-full bg-stone-600 flex items-center justify-center">
-              <p className="text-gray-300 text-lg">Waiting...</p>
+              <p className="text-cream text-lg">انتظر من فضلك...</p>
             </div>
           )}
+          </div>
         </div>
       </div>
 
