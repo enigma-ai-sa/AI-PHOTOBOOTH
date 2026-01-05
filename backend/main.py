@@ -40,36 +40,168 @@ CORS(app, resources={r"/*":
     "allow_headers": ["Content-Type"]}})
 
 options = {
-    "ghibli": {
+    #astronaut
+    "ghibli_astronaut": {
         "prompt": """
-        Create a full-body shot of the person(s) in the provided photo in a semi-realisticStudio Ghibli style.
-        Set the background to AlUla mountains which is provided as a reference image, it should be night time, with stars visible.
-        """,
-        "reference_images": [Image.open("./references/alula_mountains.png")]
+        Take the person(s) from the provided image and generate an image of them wearing a astronaut outfit and in a space station setting.
+        Ensure the person(s)' face and features remain completely unchanged.
+        Make the style of the generated image be a hyper-realistic in a Ghibli anime style.
+        """
+        
     },
-    "studio": {
+    "studio_astronaut": {
         "prompt": """
-        Take the person(s) from the provided image and generate a Studio Portrait a blurred background of sparkles.
-        Ensure the person(s)' face and features remain completely unchanged. Keep the face untouched, only blur the background.
+        Take the person(s) from the provided image and generate a Studio Portrait of them wearing a astronaut outfit and in a space station setting.
+        Ensure the person(s)' face and features remain completely unchanged. Keep the face untouched.
+
         """
     },
-    "2026": {
+    #doctor
+    "ghibli_doctor": {
         "prompt": """
-        Take the person(s) from the provided image and generate a hyper-realistic image of them with
-        the background displays a spectacular New Year's Eve atmosphere with a drone light show in the night sky explicitly spelling "2026", accompanied by elegant gold and silver fireworks. The scene is illuminated by the festival lights and starlight.
-        Ensure the person(s)' face and features remain completely unchanged. Keep the face untouched.
-        """,
-        "reference_images": [Image.open("./references/alula_mountains.png")]
+        Take the person(s) from the provided image and generate an image of them wearing a doctor outfit and in a hospital setting.
+        Ensure the person(s)' face and features remain completely unchanged.
+        Make the style of the generated image be a hyper-realistic in a Ghibli anime style.
+        """
+        
     },
-    "HNY": {
+    "studio_doctor": {
         "prompt": """
-        Take the person(s) from the provided image and generate a hyper-realistic image of them with
-        the background displays a spectacular New Year's Eve atmosphere with a drone light show in the night sky explicitly spelling "Happy New Year from AlUla", accompanied by elegant gold and silver fireworks. The scene is illuminated by the festival lights and starlight.
+        Take the person(s) from the provided image and generate a Studio Portrait of them wearing a doctor outfit and in a hospital setting.
         Ensure the person(s)' face and features remain completely unchanged. Keep the face untouched.
-        """,
-        "reference_images": [Image.open("./references/alula_mountains.png")]
+
+        """
+    },
+    #engineer
+    "ghibli_engineer": {
+        "prompt": """
+        Take the person(s) from the provided image and generate an image of them wearing a engineer outfit and in a factory setting.
+        Ensure the person(s)' face and features remain completely unchanged.
+        Make the style of the generated image be a hyper-realistic in a Ghibli anime style.
+        """
+        
+    },
+    "studio_engineer": {
+        "prompt": """
+        Take the person(s) from the provided image and generate a Studio Portrait of them wearing a engineer outfit and in a factory setting.
+        Ensure the person(s)' face and features remain completely unchanged. Keep the face untouched.
+
+        """
+    },
+    #pilot
+    "ghibli_pilot": {
+        "prompt": """
+        Take the person(s) from the provided image and generate an image of them wearing a pilot outfit and in a plane cockpit setting.
+        Ensure the person(s)' face and features remain completely unchanged.
+        Make the style of the generated image be a hyper-realistic in a Ghibli anime style.
+        """
+        
+    },
+    "studio_pilot": {
+        "prompt": """
+        Take the person(s) from the provided image and generate a Studio Portrait of them wearing a pilot outfit and in a plane cockpit setting.
+        Ensure the person(s)' face and features remain completely unchanged. Keep the face untouched.
+
+        """
+    },
+    #police
+    "ghibli_police": {
+        "prompt": """
+        Take the person(s) from the provided image and generate an image of them wearing a saudi police outfit and in a police station setting.
+        Ensure the person(s)' face and features remain completely unchanged.
+        Make the style of the generated image be a hyper-realistic in a Ghibli anime style.
+        """
+        
+    },
+    "studio_police": {
+        "prompt": """
+        Take the person(s) from the provided image and generate a Studio Portrait of them wearing a saudi police outfit and in a police station setting.
+        Ensure the person(s)' face and features remain completely unchanged. Keep the face untouched.
+
+        """
+    },
+    #fireman
+    "ghibli_fireman": {
+        "prompt": """
+        Take the person(s) from the provided image and generate an image of them wearing a fireman outfit and in a fire station setting.
+        Ensure the person(s)' face and features remain completely unchanged.
+        Make the style of the generated image be a hyper-realistic in a Ghibli anime style.
+        """
+        
+    },
+    "studio_fireman": {
+        "prompt": """
+        Take the person(s) from the provided image and generate a Studio Portrait of them wearing a fireman outfit and in a fire station setting.
+        Ensure the person(s)' face and features remain completely unchanged. Keep the face untouched.
+
+        """
+    },
+    #teacher
+    "ghibli_teacher": {
+        "prompt": """
+        Take the person(s) from the provided image and generate an image of them wearing a teacher outfit and in a classroom setting.
+        Ensure the person(s)' face and features remain completely unchanged.
+        Make the style of the generated image be a hyper-realistic in a Ghibli anime style.
+        """
+        
+    },
+    "studio_teacher": {
+        "prompt": """
+        Take the person(s) from the provided image and generate a Studio Portrait of them wearing a teacher outfit and in a classroom setting.
+        Ensure the person(s)' face and features remain completely unchanged. Keep the face untouched.
+
+        """
+    },
+        #judge
+    "ghibli_judge": {
+        "prompt": """
+        Take the person(s) from the provided image and generate an image of them wearing a saudi judge (white thobe, white shimagh without iqal, and black bisht) outfit and in a courtroom setting.
+        Ensure the person(s)' face and features remain completely unchanged.
+        Make the style of the generated image be a hyper-realistic in a Ghibli anime style.
+        """
+        
+    },
+    "studio_judge": {
+        "prompt": """
+        Take the person(s) from the provided image and generate a Studio Portrait of them wearing a a saudi judge (white thobe, white shimagh without iqal, and black bisht) outfit and in a courtroom setting.
+        Ensure the person(s)' face and features remain completely unchanged. Keep the face untouched.
+
+        """
+    },
+    #chemist
+    "ghibli_chemist": {
+        "prompt": """
+        Take the person(s) from the provided image and generate an image of them wearing a chemist outfit and in a laboratory setting.
+        Ensure the person(s)' face and features remain completely unchanged.
+        Make the style of the generated image be a hyper-realistic in a Ghibli anime style.
+        """
+        
+    },
+    "studio_chemist": {
+        "prompt": """
+        Take the person(s) from the provided image and generate a Studio Portrait of them wearing a chemist outfit and in a laboratory setting.
+        Ensure the person(s)' face and features remain completely unchanged. Keep the face untouched.
+
+        """
+    },
+    #artist
+    "ghibli_artist": {
+        "prompt": """
+        Take the person(s) from the provided image and generate an image of them wearing a artist outfit and in an art studio setting.
+        Ensure the person(s)' face and features remain completely unchanged.
+        Make the style of the generated image be a hyper-realistic in a Ghibli anime style.
+        """
+        
+    },
+    "studio_artist": {
+        "prompt": """
+        Take the person(s) from the provided image and generate a Studio Portrait of them wearing a artist outfit in an art studio setting.
+        Ensure the person(s)' face and features remain completely unchanged. Keep the face untouched.
+
+        """
     }
 }
+
 
 # THE ENDPOINTS FOR IMAGE GENERATION - should receive an option parameter
 @app.route('/image-generator', methods=['POST'])
