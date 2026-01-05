@@ -1,10 +1,11 @@
 "use client";
+import Logo from "@/components/Logo";
 import Button from "@/components/UI/Button";
 import { imageOptions } from "@/data/imageOptions";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { LuArrowRight } from "react-icons/lu";
+import { LuArrowLeft, LuArrowRight } from "react-icons/lu";
 
 export default function SelectStyle() {
   const [selectedOption, setSelectedOption] = useState<string | null>(null);
@@ -33,26 +34,31 @@ export default function SelectStyle() {
   };
 
   return (
-    <div className="h-dvh p-4 md:p-8 bg-white">
+    <div className="h-dvh p-4 md:p-8 !pt-0 bg-forest-green bg-[url('/patterns/background.svg')] bg-repeat-round">
       <div className="w-full h-full py-6 rounded-2xl flex flex-col">
         {/* Main Content Area */}
         <div className="flex-1 py-6 flex flex-col gap-15 min-h-0">
+          <div className="flex justify-end">
+            <Logo width={150} height={80} className="" />
+          </div>
           {/* Title */}
-          <h2 className="text-7xl text-gradient-blue-end font-medium text-center">
-            Choose Your New Year's <span className="block">Photo Style</span>
+          <h2 className="text-8xl text-cream font-medium text-center">
+            اختر مهنتك المفضلة
           </h2>
 
           {/* Image Options Grid */}
-          <div className="grid grid-cols-1 md:grid-cols-2 md:grid-rows-[1fr_1fr_auto] gap-6 flex-1 min-h-0">
+          <div className="grid grid-cols-1 md:grid-cols-2 md:grid-rows-[1fr_1fr_auto] gap-6 flex-1 min-h-0 overflow-y-auto">
             {imageOptions.map((option) => (
               <div
                 key={option.id}
-                className={`relative cursor-pointer rounded-[25px] md:rounded-[50px] transition-all duration-200 border-8 md:border-[15px] overflow-hidden ${
-                  option.image ? "flex flex-col" : "md:col-span-2 flex items-center justify-center h-30"
+                className={`relative cursor-pointer rounded-[25px] md:rounded-[50px] transition-all duration-200 border-8 md:border-[15px] overflow-hidden h-[650px] ${
+                  option.image
+                    ? "flex flex-col"
+                    : "md:col-span-2 flex items-center justify-center"
                 } ${
                   selectedOption === option.id
-                    ? "border-gradient-blue-end bg-gradient-blue-end"
-                    : "border-gray-400 hover:scale-[1.02] bg-gray-400"
+                    ? "border-gold bg-gold"
+                    : "border-cream hover:scale-[1.02] bg-cream"
                 }`}
                 onClick={() => handleOptionSelect(option.id)}
               >
@@ -70,8 +76,8 @@ export default function SelectStyle() {
                     <div
                       className={`p-6 transition-colors duration-200 flex-shrink-0 ${
                         selectedOption === option.id
-                          ? "bg-gradient-blue-end text-white"
-                          : "bg-gray-400  text-black"
+                          ? "bg-gold text-white"
+                          : "bg-cream  text-black"
                       }`}
                     >
                       <p className="text-center font-medium text-2xl">
@@ -83,8 +89,8 @@ export default function SelectStyle() {
                   <div
                     className={`p-6 transition-colors duration-200 w-full ${
                       selectedOption === option.id
-                        ? "bg-gradient-blue-end text-white"
-                        : "bg-gray-400  text-black"
+                        ? "bg-gold text-white"
+                        : "bg-cream  text-black"
                     }`}
                   >
                     <p className="text-center font-medium text-2xl">
@@ -96,25 +102,33 @@ export default function SelectStyle() {
             ))}
           </div>
 
-          {/* Navigation Buttons */}
-          <div className="flex flex-col md:flex-row justify-between items-center gap-4 md:gap-6 w-full flex-shrink-0">
-            <Button
-              onClick={handleBack}
-              variant="tertiary"
-              size="large"
-              className="w-full order-2 md:order-1"
-            >
-              Back
-            </Button>
-            <Button
-              onClick={handleNext}
-              disabled={!selectedOption}
-              variant="primary"
-              size="large"
-              className="w-full order-1 md:order-2 flex items-center justify-center gap-4"
-            >
-              Next <LuArrowRight size={46} />
-            </Button>
+          {/* Scroll Instruction & Navigation Buttons */}
+          <div className="flex flex-col gap-6 w-full flex-shrink-0">
+            {/* Scroll Instruction */}
+            <p className="text-center text-white text-4xl font-medium">
+              أسحب لأعلي لمزيد من الخيارات
+            </p>
+
+            {/* Navigation Buttons */}
+            <div className="flex flex-col md:flex-row justify-between items-center gap-4 md:gap-6 w-full">
+              <Button
+                onClick={handleBack}
+                variant="tertiary"
+                size="large"
+                className="w-full order-2 md:order-1 flex items-center justify-center gap-4 leading-none"
+              >
+                <LuArrowLeft size={46} className="-mb-3" /> رجوع
+              </Button>
+              <Button
+                onClick={handleNext}
+                disabled={!selectedOption}
+                variant="primary"
+                size="large"
+                className="w-full order-1 md:order-2 flex items-center justify-center gap-4"
+              >
+                التالي <LuArrowRight size={46} />
+              </Button>
+            </div>
           </div>
         </div>
       </div>

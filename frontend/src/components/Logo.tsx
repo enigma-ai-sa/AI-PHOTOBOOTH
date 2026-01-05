@@ -18,7 +18,7 @@ export default function Logo({
   return (
     <div className={className}>
       <Image
-        src="./assets/logo2.svg"
+        src="./assets/kidsLogo.svg"
         alt="AI Photo Booth Logo"
         width={width}
         height={height}

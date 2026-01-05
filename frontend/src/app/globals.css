@@ -1,6 +1,54 @@
-@import url("https://fonts.googleapis.com/css2?family=Alexandria:wght@100..900&display=swap");
-
 @import "tailwindcss";
+
+/* DIN Next LT Arabic Font Family */
+@font-face {
+  font-family: "DIN Next LT Arabic";
+  src: url("/fonts/ArbFONTS-DINNextLTArabic-UltraLight-1.ttf") format("truetype");
+  font-weight: 200;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "DIN Next LT Arabic";
+  src: url("/fonts/ArbFONTS-DINNEXTLTARABIC-LIGHT-1.ttf") format("truetype");
+  font-weight: 300;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "DIN Next LT Arabic";
+  src: url("/fonts/ArbFONTS-DINNextLTArabic-Regular-2.ttf") format("truetype");
+  font-weight: 400;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "DIN Next LT Arabic";
+  src: url("/fonts/ArbFONTS-DINNextLTArabic-Medium-2.ttf") format("truetype");
+  font-weight: 500;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "DIN Next LT Arabic";
+  src: url("/fonts/ArbFONTS-DINNextLTArabic-Bold-2.ttf") format("truetype");
+  font-weight: 700;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "DIN Next LT Arabic";
+  src: url("/fonts/ArbFONTS-DINNextLTArabic-Heavy-1.ttf") format("truetype");
+  font-weight: 800;
+  font-style: normal;
+}
+
+@font-face {
+  font-family: "DIN Next LT Arabic";
+  src: url("/fonts/ArbFONTS-DINNextLTArabic-Black-2.ttf") format("truetype");
+  font-weight: 900;
+  font-style: normal;
+}
 
 :root {
   --background: #ffffff;
@@ -10,8 +58,8 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: "Alexandria", "Neuropol X Cond Bold", monospace;
-  --font-mono: "Alexandria", "Neuropol X Cond Bold", monospace;
+  --font-sans: "DIN Next LT Arabic", sans-serif;
+  --font-mono: "DIN Next LT Arabic", monospace;
 
   /* Blue Gradient */
   --color-gradient-blue-start: #153c61;
@@ -59,6 +107,11 @@
   --color-accent-green-500: #bad531;
   --color-accent-green-400: #dce995;
   --color-accent-green-300: #f9fcee;
+
+  /* New Colors */
+  --color-forest-green: #205B46;
+  --color-gold: #B3A376;
+  --color-cream: #E0CFA0;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -71,7 +124,7 @@
 body {
   background: var(--color-foreground);
   color: var(--foreground);
-  font-family: "Alexandria", "Neuropol X Cond Bold", monospace;
+  font-family: "DIN Next LT Arabic", sans-serif;
   font-weight: 700;
 }
 
