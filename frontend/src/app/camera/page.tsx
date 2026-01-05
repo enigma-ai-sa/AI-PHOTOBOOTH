@@ -5,7 +5,6 @@ import { useCallback, useRef, useState } from "react";
 import { IoCameraOutline } from "react-icons/io5";
 import { LuArrowLeft } from "react-icons/lu";
 import Webcam from "react-webcam";
-import Logo from "@/components/Logo";
 
 export default function Camera() {
   const webcamRef = useRef<Webcam>(null);
@@ -113,11 +112,6 @@ export default function Camera() {
   return (
     <div className="h-dvh p-4 md:p-8 !pt-0 bg-forest-green bg-[url('/patterns/background.svg')] bg-repeat-round">
       <div className="w-full h-full py-6 rounded-2xl flex flex-col">
-        {/* Logo */}
-        <div className="flex justify-end">
-          <Logo width={150} height={80} className="" />
-        </div>
-
         {/* Main Content Area */}
         <div className="flex-1 flex flex-col gap-6 min-h-0">
           {/* Title */}
@@ -159,7 +153,7 @@ export default function Camera() {
           {/* Bottom controls - outside camera container */}
           <div className="w-full grid grid-cols-3 gap-4 py-6 px-6 flex-shrink-0">
             <button
-              onClick={() => router.push("/select-style")}
+              onClick={() => router.push("/select-profession")}
               className="text-cream text-5xl font-normal flex items-center gap-6"
             >
               <LuArrowLeft /> رجوع

@@ -5,7 +5,6 @@ import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { FiCheck, FiRefreshCw } from "react-icons/fi";
-import Logo from "@/components/Logo";
 
 export default function Preview() {
   const router = useRouter();
@@ -19,7 +18,7 @@ export default function Preview() {
 
     if (!image) {
       // If no image, redirect back to camera
-      router.push("/select-style");
+      router.push("/select-type");
       return;
     }
 
@@ -32,7 +31,7 @@ export default function Preview() {
     if (endpoint) {
       router.push(`/camera?endpoint=${endpoint}`);
     } else {
-      router.push("/select-style");
+      router.push("/select-type");
     }
   };
 
@@ -48,11 +47,6 @@ export default function Preview() {
   return (
     <div className="h-dvh p-4 md:p-8 !pt-0 bg-forest-green bg-[url('/patterns/background.svg')] bg-repeat-round">
       <div className="w-full h-full py-6 rounded-2xl flex flex-col">
-        {/* Logo */}
-        <div className="flex justify-end pb-10">
-          <Logo width={150} height={80} className="" />
-        </div>
-
         {/* Main Content Area */}
         <div className="flex-1 flex flex-col gap-6 min-h-0 ">
           {/* Image container - centered */}

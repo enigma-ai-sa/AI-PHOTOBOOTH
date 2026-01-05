@@ -20,26 +20,21 @@ export default function Home() {
       />
 
       {/* Content layer */}
-      <div className="relative z-10 h-full p-10 flex flex-col justify-between">
-        {/* Logo in top right */}
-        <div className="flex justify-end ">
-          <Logo width={150} height={80} className="" />
-        </div>
-
+      <div className="relative z-10 h-full p-10 flex flex-col justify-end">
         {/* Bottom content section */}
         <div className="pb-10 flex flex-col gap-30">
           <div className="mx-auto text-center text-cream font-bold flex flex-col items-center pb-20">
             <h1 className="text-[144px]">
-              إختَـــــــــــــــــر مهنتك المـســـــــــتقبلية
+              شوف شكلك بالمستقبل
             </h1>
           </div>
 
           <div className="mx-auto text-center text-white w-full flex flex-col gap-6 font-normal">
             <h3 className="text-4xl">
-              شوف شكلك بالمستقبل — بالمهنة اللي تختارها!
+              اختر الستايل والمهنة اللي تحبها!
             </h3>
             <Button
-              onClick={() => router.push("/select-style")}
+              onClick={() => router.push("/select-type")}
               variant="primary"
               size="large"
               className="w-full flex items-center justify-center gap-4"
