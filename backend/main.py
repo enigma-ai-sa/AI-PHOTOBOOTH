@@ -23,7 +23,7 @@ s3 = boto3.client(
     region_name=os.getenv("S3_REGION")
 )
 
-key = "/images/new_years"
+key = "/images/kids_event"
 
 # GLOBAL VARIABLES
 client = genai.Client(
