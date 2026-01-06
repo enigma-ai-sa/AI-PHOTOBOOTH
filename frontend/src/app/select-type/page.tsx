@@ -3,7 +3,7 @@
 import Button from "@/components/UI/Button";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { LuArrowRight } from "react-icons/lu";
+import { LuArrowLeft, LuArrowRight } from "react-icons/lu";
 
 export default function SelectType() {
   const [selectedStyle, setSelectedStyle] = useState<
@@ -22,6 +22,10 @@ export default function SelectType() {
       // Navigate to profession selection
       router.push("/select-profession");
     }
+  };
+
+  const handleBack = () => {
+    router.push("/");
   };
 
   return (
@@ -81,13 +85,21 @@ export default function SelectType() {
         {/* Navigation Buttons - Fixed at bottom */}
         <div className="flex flex-col md:flex-row justify-between items-center gap-4 md:gap-6 w-full flex-shrink-0">
           <Button
+            onClick={handleBack}
+            variant="tertiary"
+            size="large"
+            className="w-full order-2 md:order-1 flex items-center justify-center gap-4 leading-none"
+          >
+            <LuArrowLeft size={46} className="-mb-3" /> رجوع
+          </Button>
+          <Button
             onClick={handleNext}
             disabled={!selectedStyle}
             variant="primary"
             size="large"
-            className="w-full flex items-center justify-center gap-4"
+            className="w-full order-1 md:order-2 flex items-center justify-center gap-4 leading-none"
           >
-            التالي <LuArrowRight size={46} />
+            التالي <LuArrowRight size={46} className="-mb-3" />
           </Button>
         </div>
       </div>
