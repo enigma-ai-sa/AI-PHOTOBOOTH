@@ -132,8 +132,8 @@ export default function Processing() {
     <div className="h-dvh p-4 md:p-8 !pt-0 bg-forest-green bg-[url('/patterns/background.svg')] bg-repeat-round">
       <div className="w-full h-full py-6 rounded-2xl flex flex-col">
         {/* Main Content Area */}
-        <div className="flex-1 flex flex-col min-h-0 gap-4">
-          <div className="rounded-[50px] overflow-hidden border-[15px] border-cream w-full flex-1">
+        <div className="flex-1 flex flex-col min-h-0 gap-4 items-center justify-center">
+          <div className="rounded-[50px] overflow-hidden border-[15px] border-cream w-full max-w-6xl aspect-[3/2]">
             {isLoading ? (
               <div className="relative w-full h-full bg-stone-600 flex items-center justify-center overflow-hidden">
                 {/* Main loading content */}
