@@ -50,8 +50,8 @@ export default function Preview() {
         {/* Main Content Area */}
         <div className="flex-1 flex flex-col gap-6 min-h-0 ">
           {/* Image container - centered */}
-          <div className="relative w-full flex-1 flex items-center justify-center">
-            <div className="rounded-[50px] overflow-hidden border-[15px] border-gold w-full h-full relative">
+          <div className="relative w-full max-w-6xl mx-auto flex-1 flex items-center justify-center">
+            <div className="rounded-[50px] overflow-hidden border-[15px] border-gold w-full aspect-[3/2] relative">
               <Image
                 src={capturedImage}
                 alt="Captured photo"

@@ -120,8 +120,8 @@ export default function Camera() {
           </h2>
 
           {/* Camera container - centered */}
-          <div className="relative w-full flex-1 flex items-center justify-center">
-            <div className="rounded-[50px] overflow-hidden border-[15px] border-gold w-full h-full relative">
+          <div className="relative w-full max-w-6xl mx-auto flex-1 flex items-center justify-center">
+            <div className="rounded-[50px] overflow-hidden border-[15px] border-gold w-full aspect-[3/2] relative">
               <Webcam
                 audio={false}
                 ref={webcamRef}
