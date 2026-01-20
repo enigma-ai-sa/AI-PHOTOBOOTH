@@ -1,0 +1,8 @@
+openai
+dotenv
+fastapi
+uvicorn
+python-multipart
+boto3
+qrcode
+pillow
