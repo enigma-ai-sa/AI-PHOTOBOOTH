@@ -21,6 +21,11 @@ const nextConfig: NextConfig = {
         port: '5000',
         pathname: '/**',
       },
+      {
+        protocol: 'https',
+        hostname: '*.s3.*.amazonaws.com',
+        pathname: '/**',
+      },
     ],
     unoptimized: false,
     dangerouslyAllowSVG: false,

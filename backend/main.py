@@ -3,6 +3,7 @@ from openai import OpenAI
 from fastapi import FastAPI, UploadFile, File, HTTPException, Form
 from fastapi.responses import Response, HTMLResponse, StreamingResponse
 from fastapi.middleware.cors import CORSMiddleware
+from fastapi.middleware.gzip import GZipMiddleware
 from dotenv import load_dotenv
 import time
 import os
@@ -36,6 +37,9 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
+# Add GZip compression for responses > 1KB (significant bandwidth savings)
+app.add_middleware(GZipMiddleware, minimum_size=1000)
+
 # CONFIGURATIONS
 
 # s3 bucket
@@ -56,22 +60,38 @@ client = OpenAI(
 options = {
     "bluebrains": {
         "prompt": """
-        Take the person(s) from the provided image and generate a sophisticated, modern portrait for a medical conference setting. The subject should remain exactly as captured in the original image, including their clothing, suit, and overall appearance. Do not modify, replace, or stylize the clothing in any way. Integrate the subject into a high-tech, futuristic environment inspired by neuro-oncology. The background should feature clean, glowing holographic visualizations of brain structures and abstract neural network data, representing advanced neuroscience and innovation. The scientific graphics should appear as a refined background or flowing elements around the subject, and must not overlap, distort, or cover the face. Add the event title "MECNO 2026" in a bold, modern sans-serif font, styled as a premium medical conference header. Use a professional "modern medical" color palette with deep navy blues, electric cyan highlights, and clean white accents. The overall mood should feel innovative, authoritative, and visionary. Ensure the person(s)' face and facial features remain completely unchanged. Keep the face untouched. Also render the image vertical and not horizontal.
+        CRITICAL REQUIREMENT: The person's face MUST remain 100% identical to the original photo. Do NOT alter, modify, stylize, reshape, or touch the face in ANY way. Preserve exact facial structure, features, skin tone, expressions, eyes, nose, mouth, and all facial details pixel-perfectly.
+        
+        Take the person(s) from the provided image and generate a sophisticated, modern portrait for a medical conference setting. The subject should remain exactly as captured in the original image, including their clothing, suit, and overall appearance. Do not modify, replace, or stylize the clothing in any way. Integrate the subject into a high-tech, futuristic environment inspired by neuro-oncology. The background should feature clean, glowing holographic visualizations of brain structures and abstract neural network data, representing advanced neuroscience and innovation. The scientific graphics should appear as a refined background or flowing elements around the subject, and must not overlap, distort, or cover the face. Add the event title "MECNO 2026" in a bold, modern sans-serif font, styled as a premium medical conference header. Use a professional "modern medical" color palette with deep navy blues, electric cyan highlights, and clean white accents. The overall mood should feel innovative, authoritative, and visionary.
+        
+        REMINDER: Do NOT change the face. The face must be an EXACT copy from the original image - same structure, same features, same expression, same skin texture. Only modify the background and environment. Render the image vertical, not horizontal.
         """
     },
     "mecno2026": {
         "prompt": """
-        Take the person(s) from the provided image and generate a clean, high-quality professional portrait suitable for a medical conference. The subject should remain exactly as captured in the original image, including their clothing, suit, and overall appearance. Do not change, replace, or stylize the clothing in any way. Enhance lighting, posture, and image clarity naturally using AI, without altering facial features or expressions. Set a minimal, elegant background using neutral or soft medical tones that keep full focus on the subject. Add the event title "MECNO 2026" at the top of the image in a modern, professional sans-serif font, styled like a high-end medical conference header. Ensure the person(s)' face and facial features remain completely unchanged. Keep the face untouched.
+        CRITICAL REQUIREMENT: The person's face MUST remain 100% identical to the original photo. Do NOT alter, modify, stylize, reshape, or touch the face in ANY way. Preserve exact facial structure, features, skin tone, expressions, eyes, nose, mouth, and all facial details pixel-perfectly.
+        
+        Take the person(s) from the provided image and generate a clean, high-quality professional portrait suitable for a medical conference. The subject should remain exactly as captured in the original image, including their clothing, suit, and overall appearance. Do not change, replace, or stylize the clothing in any way. Enhance lighting and image clarity naturally using AI, but NEVER alter facial features or expressions. Set a minimal, elegant background using neutral or soft medical tones that keep full focus on the subject. Add the event title "MECNO 2026" at the top of the image in a modern, professional sans-serif font, styled like a high-end medical conference header.
+        
+        REMINDER: Do NOT change the face. The face must be an EXACT copy from the original image - same structure, same features, same expression, same skin texture. Only modify the background.
         """
     },
     "riyadhcity": {
         "prompt": """
-        Take the person(s) from the provided image and generate a semi-realistic, hand-painted Studio Ghibli–style illustration inspired by classic Japanese animation. The person should appear as a confident professional wearing a formal suit, with a calm and natural smile. The style should be elegant, warm, and cinematic, not cartoonish. Set the background as the distinctive skyline of the King Abdullah Financial District (KAFD / Abraj Al-Maliyah) in Riyadh, Saudi Arabia, featuring the iconic geometric skyscrapers and the PIF Tower clearly visible in the distance. Above the skyline, include soft glowing neural networks forming a transparent brain shape in the sky, with floating light particles and gentle clouds. Use a color palette of blue, white, and soft gold. The mood should feel intelligent, hopeful, and visionary, suitable for a medical innovation conference. Ensure the person(s)' face and facial features remain completely unchanged. Keep the face untouched.
+        CRITICAL REQUIREMENT: The person's face MUST remain 100% identical to the original photo. Do NOT alter, modify, stylize, reshape, or touch the face in ANY way. Preserve exact facial structure, features, skin tone, expressions, eyes, nose, mouth, and all facial details pixel-perfectly. Even though this is a Ghibli-style illustration, the FACE must remain photorealistic and unchanged.
+        
+        Take the person(s) from the provided image and generate a semi-realistic, hand-painted Studio Ghibli–style illustration inspired by classic Japanese animation. Apply the artistic style ONLY to the background and environment, NOT to the person's face. The person should appear as a confident professional wearing a formal suit. The style should be elegant, warm, and cinematic, not cartoonish. Set the background as the distinctive skyline of the King Abdullah Financial District (KAFD / Abraj Al-Maliyah) in Riyadh, Saudi Arabia, featuring the iconic geometric skyscrapers and the PIF Tower clearly visible in the distance. Above the skyline, include soft glowing neural networks forming a transparent brain shape in the sky, with floating light particles and gentle clouds. Use a color palette of blue, white, and soft gold. The mood should feel intelligent, hopeful, and visionary, suitable for a medical innovation conference.
+        
+        REMINDER: Do NOT stylize or change the face. The face must be an EXACT photorealistic copy from the original image - same structure, same features, same expression, same skin texture. Only apply artistic style to the background, not the person.
         """
     },
     "sketch": {
         "prompt": """
-        Take the person(s) from the provided image and generate a clean, semi-realistic hand-drawn sketch or illustration style portrait, as if the subject was carefully sketched or drawn by an artist. The illustration should preserve accurate proportions and likeness, using soft pencil, ink, or light charcoal-style lines with minimal shading. The overall style should feel artistic, refined, and professional, not exaggerated or cartoon-like. Set a simple, neutral background with light texture or off-white tones to emphasize the sketch effect and keep the focus on the subject. Ensure the person(s)' face and facial features remain completely unchanged. Keep the face untouched. Render it vertical and not horizontal.
+        CRITICAL REQUIREMENT: The person's face MUST remain 100% identical to the original photo. Do NOT alter, modify, stylize, reshape, or touch the face in ANY way. Preserve exact facial structure, features, skin tone, expressions, eyes, nose, mouth, and all facial details pixel-perfectly. Even though this is a sketch style, the FACE must remain photorealistic and unchanged.
+        
+        Take the person(s) from the provided image and generate a clean, semi-realistic hand-drawn sketch or illustration style portrait, as if the subject was carefully sketched or drawn by an artist. Apply the sketch effect ONLY to the background and edges, keeping the face photorealistic. The illustration should preserve accurate proportions and likeness. The overall style should feel artistic, refined, and professional, not exaggerated or cartoon-like. Set a simple, neutral background with light texture or off-white tones to emphasize the sketch effect and keep the focus on the subject.
+        
+        REMINDER: Do NOT sketch or stylize the face. The face must be an EXACT photorealistic copy from the original image - same structure, same features, same expression, same skin texture. Only apply sketch style to the background. Render it vertical, not horizontal.
         """
     }
 }
@@ -207,7 +227,9 @@ async def generate_image_json(request_data: dict):
     """
     Non-streaming endpoint for image generation.
     Accepts JSON: { "image": "base64_string", "option": "ghibli|studio|2026|HNY" }
-    Returns JSON: { "image": "base64_string", "qrCode": "base64_string" }
+    Returns JSON: { "imageUrl": "s3_url", "qrCode": "base64_string" }
+    
+    OPTIMIZED: Returns S3 URL instead of base64 to reduce response size from ~10MB to ~200 bytes
     """
     image_base64 = request_data.get("image")
     option = request_data.get("option")
@@ -259,39 +281,40 @@ async def generate_image_json(request_data: dict):
         
         print("✅ Image generated successfully")
         
-        # Generate QR code if enabled
+        # ALWAYS upload to S3 and return URL (optimized for slow networks)
+        bucket_name = os.getenv('S3_BUCKET_NAME')
+        region = os.getenv('S3_REGION')
+        
+        if not bucket_name or not region:
+            raise HTTPException(status_code=500, detail="S3 not configured - required for optimized delivery")
+        
+        # Upload to S3
+        image_bytes_out = base64.b64decode(generated_image_b64)
+        filename = f"{key}/{int(time.time())}_{uuid.uuid4().hex[:8]}.png"
+        
+        s3.put_object(
+            Bucket=bucket_name,
+            Key=filename,
+            Body=image_bytes_out,
+            ContentType="image/png",
+            ContentDisposition="inline"
+        )
+        
+        s3_url = f"https://{bucket_name}.s3.{region}.amazonaws.com/{filename}"
+        print(f"☁️ Image uploaded to S3: {s3_url}")
+        
+        # Generate QR code
         qr_code_b64 = None
         if QRCODE:
             try:
-                bucket_name = os.getenv('S3_BUCKET_NAME')
-                region = os.getenv('S3_REGION')
-                
-                if bucket_name and region:
-                    # Upload to S3
-                    image_bytes_out = base64.b64decode(generated_image_b64)
-                    filename = f"{key}/{int(time.time())}_{uuid.uuid4().hex[:8]}.png"
-                    
-                    s3.put_object(
-                        Bucket=bucket_name,
-                        Key=filename,
-                        Body=image_bytes_out,
-                        ContentType="image/png",
-                        ContentDisposition="inline"
-                    )
-                    
-                    s3_url = f"https://{bucket_name}.s3.{region}.amazonaws.com/{filename}"
-                    print(f"☁️ Image uploaded to S3: {s3_url}")
-                    
-                    # Generate QR code
-                    qr_code_b64 = generate_qr_code(s3_url)
-                    print("📱 QR code generated")
-                else:
-                    print("⚠️ S3 not configured, skipping QR code")
-            except Exception as s3_err:
-                print(f"⚠️ S3/QR error (non-fatal): {s3_err}")
+                qr_code_b64 = generate_qr_code(s3_url)
+                print("📱 QR code generated")
+            except Exception as qr_err:
+                print(f"⚠️ QR error (non-fatal): {qr_err}")
         
+        # Return URL instead of base64 (~200 bytes vs ~10MB)
         return {
-            "image": generated_image_b64,
+            "imageUrl": s3_url,
             "qrCode": qr_code_b64
         }
         

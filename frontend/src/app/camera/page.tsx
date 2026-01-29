@@ -81,6 +81,7 @@ export default function Camera() {
             audio={false}
             ref={webcamRef}
             screenshotFormat="image/jpeg"
+            screenshotQuality={0.7}
             videoConstraints={videoConstraints}
             className="w-full h-full object-cover transform -scale-x-100 bg-stone-600"
           />

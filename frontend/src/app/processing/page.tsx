@@ -7,6 +7,41 @@ import { useEffect, useRef, useState } from "react";
 import { IoRefreshOutline } from "react-icons/io5";
 // import { IoPrint } from "react-icons/io5"; // Commented out - print feature disabled
 
+// Network-aware timeout detection for slow WiFi
+const getNetworkAwareTimeout = (): number => {
+  if (typeof navigator !== "undefined" && "connection" in navigator) {
+    const connection = (navigator as Navigator & { 
+      connection?: { effectiveType?: string; downlink?: number } 
+    }).connection;
+    
+    if (connection?.effectiveType) {
+      // Adjust timeout based on connection type
+      switch (connection.effectiveType) {
+        case "slow-2g":
+          return 180000; // 3 minutes for very slow connections
+        case "2g":
+          return 150000; // 2.5 minutes
+        case "3g":
+          return 120000; // 2 minutes
+        default:
+          return 90000; // 1.5 minutes for 4g/wifi
+      }
+    }
+    
+    // If we have downlink info, adjust accordingly
+    if (connection?.downlink && connection.downlink < 1) {
+      return 180000; // 3 minutes for < 1 Mbps
+    }
+  }
+  return 90000; // Default 90 seconds
+};
+
+// Exponential backoff delay calculation
+const getRetryDelay = (attempt: number): number => {
+  // Exponential backoff: 2s, 4s, 8s, capped at 15s
+  return Math.min(2000 * Math.pow(2, attempt), 15000);
+};
+
 export default function Processing() {
   const [capturedImage, setCapturedImage] = useState<string | null>(null);
   const [generatedImage, setGeneratedImage] = useState<string | null>(null);
@@ -14,6 +49,7 @@ export default function Processing() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [retryCount, setRetryCount] = useState(0);
+  const [loadingMessage, setLoadingMessage] = useState("Creating your photo...");
   const [showPrintModal, setShowPrintModal] = useState(false);
   const [printCopies, setPrintCopies] = useState(1);
   const hasStartedGenerationRef = useRef(false);
@@ -57,10 +93,20 @@ export default function Processing() {
     setIsLoading(true);
     setError(null);
     setRetryCount(attempt);
+    
+    // Update loading message based on attempt
+    if (attempt > 0) {
+      setLoadingMessage(`Retrying... (attempt ${attempt + 1}/4)`);
+    } else {
+      setLoadingMessage("Creating your photo...");
+    }
 
     try {
       const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), 90000);
+      // Use network-aware timeout
+      const timeout = getNetworkAwareTimeout();
+      console.log(`Using timeout: ${timeout}ms based on network conditions`);
+      const timeoutId = setTimeout(() => controller.abort(), timeout);
 
       const response = await fetch("/api/generate-image", {
         method: "POST",
@@ -85,27 +131,41 @@ export default function Processing() {
       if (!data.imageUrl) {
         throw new Error("No image URL received from server");
       }
+      
       console.log("Received image URL:", data.imageUrl);
       console.log("Received QR code URL:", data.qrCodeUrl);
-      console.log(
-        "Current generatedImage state before setting:",
-        generatedImage
-      );
+      
+      // Set the S3 URL - image will load directly from S3/CDN
       setGeneratedImage(data.imageUrl);
       setQrCode(data.qrCodeUrl);
-      console.log("Set generatedImage state to:", data.imageUrl);
+      
     } catch (err) {
       if (err instanceof Error) {
         if (err.name === "AbortError") {
-          if (attempt < 2) {
-            setError(`Request timed out. Retrying... (${attempt + 1}/3)`);
+          // Increased max retries to 4 for slow networks
+          if (attempt < 3) {
+            const delay = getRetryDelay(attempt);
+            setError(`Request timed out. Retrying in ${delay/1000}s... (${attempt + 1}/4)`);
             setTimeout(
               () => generateImage(imageData, attempt + 1, selectedOption),
-              2000
+              delay
             );
             return;
           } else {
-            setError("Request timed out after 3 attempts. Please try again.");
+            setError("Request timed out after 4 attempts. Please check your connection and try again.");
+          }
+        } else if (err.message.includes("Failed to fetch") || err.message.includes("network")) {
+          // Network error - retry with backoff
+          if (attempt < 3) {
+            const delay = getRetryDelay(attempt);
+            setError(`Network error. Retrying in ${delay/1000}s... (${attempt + 1}/4)`);
+            setTimeout(
+              () => generateImage(imageData, attempt + 1, selectedOption),
+              delay
+            );
+            return;
+          } else {
+            setError("Network error after 4 attempts. Please check your WiFi connection.");
           }
         } else {
           setError(err.message);
@@ -179,10 +239,13 @@ export default function Processing() {
               </div>
             </div>
             <p className="text-white text-xl sm:text-2xl lg:text-3xl font-medium">
-              {retryCount > 0
-                ? `Creating your photo... (${retryCount + 1}/3)`
-                : "Creating your photo..."}
+              {loadingMessage}
             </p>
+            {retryCount > 0 && (
+              <p className="text-gray-300 text-sm sm:text-base mt-2">
+                Slow connection detected - please wait...
+              </p>
+            )}
           </div>
         </div>
       ) : error ? (
@@ -214,9 +277,10 @@ export default function Processing() {
               onError={() => {
                 console.error("Failed to load generated image:", generatedImage);
                 setError("Failed to load the generated image. Please try again.");
+                setGeneratedImage(null);
               }}
               onLoad={() => {
-                console.log("Generated image loaded successfully");
+                console.log("Generated image loaded successfully from S3");
               }}
             />
           </div>
