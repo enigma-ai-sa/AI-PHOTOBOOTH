@@ -259,42 +259,39 @@ async def generate_image_json(request_data: dict):
         
         print("✅ Image generated successfully")
         
-        # Upload to S3 and return URL (much faster than sending base64)
+        # Generate QR code if enabled
         qr_code_b64 = None
-        s3_url = None
+        if QRCODE:
+            try:
+                bucket_name = os.getenv('S3_BUCKET_NAME')
+                region = os.getenv('S3_REGION')
+                
+                if bucket_name and region:
+                    # Upload to S3
+                    image_bytes_out = base64.b64decode(generated_image_b64)
+                    filename = f"{key}/{int(time.time())}_{uuid.uuid4().hex[:8]}.png"
+                    
+                    s3.put_object(
+                        Bucket=bucket_name,
+                        Key=filename,
+                        Body=image_bytes_out,
+                        ContentType="image/png",
+                        ContentDisposition="inline"
+                    )
+                    
+                    s3_url = f"https://{bucket_name}.s3.{region}.amazonaws.com/{filename}"
+                    print(f"☁️ Image uploaded to S3: {s3_url}")
+                    
+                    # Generate QR code
+                    qr_code_b64 = generate_qr_code(s3_url)
+                    print("📱 QR code generated")
+                else:
+                    print("⚠️ S3 not configured, skipping QR code")
+            except Exception as s3_err:
+                print(f"⚠️ S3/QR error (non-fatal): {s3_err}")
         
-        try:
-            bucket_name = os.getenv('S3_BUCKET_NAME')
-            region = os.getenv('S3_REGION')
-            
-            if bucket_name and region:
-                # Upload to S3
-                image_bytes_out = base64.b64decode(generated_image_b64)
-                filename = f"{key}/{int(time.time())}_{uuid.uuid4().hex[:8]}.png"
-                
-                s3.put_object(
-                    Bucket=bucket_name,
-                    Key=filename,
-                    Body=image_bytes_out,
-                    ContentType="image/png",
-                    ContentDisposition="inline"
-                )
-                
-                s3_url = f"https://{bucket_name}.s3.{region}.amazonaws.com/{filename}"
-                print(f"☁️ Image uploaded to S3: {s3_url}")
-                
-                # Generate QR code
-                qr_code_b64 = generate_qr_code(s3_url)
-                print("📱 QR code generated")
-            else:
-                print("⚠️ S3 not configured, falling back to base64")
-        except Exception as s3_err:
-            print(f"⚠️ S3/QR error (non-fatal): {s3_err}")
-        
-        # Return S3 URL if available, otherwise fall back to base64
         return {
-            "image": s3_url if s3_url else f"data:image/png;base64,{generated_image_b64}",
-            "imageUrl": s3_url,  # Direct URL for faster loading
+            "image": generated_image_b64,
             "qrCode": qr_code_b64
         }
         
