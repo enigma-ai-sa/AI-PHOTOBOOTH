@@ -6,6 +6,6 @@ then activate the .venv
     - mac: source .venv/bin/activate
 then install requirements.txt
     - pip install -r requirements.txt
-then you can just run: "python main.py" & you can access the test.html at http://localhost:8000/test
+then you can just run: "python main.py" & you can access the test.html at http://localhost:5000/test
 
-THE SERVER RUNS ON http://localhost:8000
+THE SERVER RUNS ON http://localhost:5000
