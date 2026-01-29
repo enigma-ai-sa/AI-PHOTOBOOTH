@@ -1,0 +1,192 @@
+@import url("https://fonts.googleapis.com/css2?family=Alexandria:wght@100..900&display=swap");
+
+@import "tailwindcss";
+
+:root {
+  --background: #ffffff;
+  --foreground: #171717;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: "Alexandria", "Neuropol X Cond Bold", monospace;
+  --font-mono: "Alexandria", "Neuropol X Cond Bold", monospace;
+
+  /* Green Gradient (Hospital Theme) */
+  --color-gradient-green-start: #007B3A;
+  --color-gradient-green-end: #004d25;
+  
+  /* Legacy Blue names mapped to Green (for compatibility) */
+  --color-gradient-blue-start: #007B3A;
+  --color-gradient-blue-end: #004d25;
+  --color-accent-gray-100: #DADADA
+
+  /* PRIMARY PURPLE Palette */
+  --color-primary-purple-700: #000000;
+  --color-primary-purple-600: #401b4f;
+  --color-primary-purple-500: #773292;
+  --color-primary-purple-400: #b370ce;
+  --color-primary-purple-300: #ddbee9;
+
+  /* PRIMARY LIGHT BLUE Palette */
+  --color-primary-light-blue-700: #0c2232;
+  --color-primary-light-blue-600: #205d88;
+  --color-primary-light-blue-500: #489ad4;
+  --color-primary-light-blue-400: #98c6e7;
+  --color-primary-light-blue-300: #eef6fb;
+
+  /* SECONDARY PINK Palette */
+  --color-secondary-pink-700: #3d001e;
+  --color-secondary-pink-600: #a80054;
+  --color-secondary-pink-500: #ff007f;
+  --color-secondary-pink-400: #ff80bf;
+  --color-secondary-pink-300: #ffebf5;
+
+  /* SECONDARY PURPLE Palette */
+  --color-secondary-purple-700: #22043a;
+  --color-secondary-purple-600: #5d0a9f;
+  --color-secondary-purple-500: #9a29f2;
+  --color-secondary-purple-400: #c687f8;
+  --color-secondary-purple-300: #f6ecfe;
+
+  /* SECONDARY LIGHT BLUE Palette */
+  --color-secondary-light-blue-700: #053837;
+  --color-secondary-light-blue-600: #0f9a96;
+  --color-secondary-light-blue-500: #4deeea;
+  --color-secondary-light-blue-400: #8bf4f1;
+  --color-secondary-light-blue-300: #ecfdfd;
+
+  /* Unlabeled Green/Yellow Palette */
+  --color-accent-green-700: #2c330a;
+  --color-accent-green-600: #798c1d;
+  --color-accent-green-500: #bad531;
+  --color-accent-green-400: #dce995;
+  --color-accent-green-300: #f9fcee;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --background: #0a0a0a;
+    --foreground: #ededed;
+  }
+}
+
+body {
+  background: var(--color-foreground);
+  color: var(--foreground);
+  font-family: "Alexandria", "Neuropol X Cond Bold", monospace;
+  font-weight: 700;
+}
+
+/* Custom brand gradient */
+.custom-brand-gradient {
+  background: linear-gradient(
+    to bottom right,
+    var(--color-primary-purple-600),
+    var(--color-primary-purple-500),
+    var(--color-primary-light-blue-500),
+    var(--color-accent-green-500)
+  );
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center;
+  position: relative;
+}
+
+@layer utilities {
+  .bg-gradient-blue {
+    background-image: linear-gradient(
+      var(--color-gradient-green-end),
+      var(--color-gradient-green-start)
+    );
+  }
+
+  .bg-gradient-green {
+    background-image: linear-gradient(
+      var(--color-gradient-green-end),
+      var(--color-gradient-green-start)
+    );
+  }
+
+  .bg-gradient-light-blue-white {
+    background: linear-gradient(to bottom, #d4f5e0 30%, #ffffff 100%);
+  }
+
+  .bg-gradient-light-green-white {
+    background: linear-gradient(to bottom, #d4f5e0 30%, #ffffff 100%);
+  }
+}
+
+@layer utilities {
+  .border-gradient-blue-white {
+    position: relative;
+    border-radius: 1.5rem; /* Match rounded-3xl from Tailwind */
+  }
+
+  .border-gradient-blue-white::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: 1.5rem;
+    padding: 1px; /* Border width */
+    background: linear-gradient(to bottom, #007B3A 0%, #ffffff 100%);
+    -webkit-mask: linear-gradient(#ffffff 0 0) content-box,
+      linear-gradient(#ffffff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+  }
+
+  .border-gradient-green-white {
+    position: relative;
+    border-radius: 1.5rem;
+  }
+
+  .border-gradient-green-white::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: 1.5rem;
+    padding: 1px;
+    background: linear-gradient(to bottom, #007B3A 0%, #ffffff 100%);
+    -webkit-mask: linear-gradient(#ffffff 0 0) content-box,
+      linear-gradient(#ffffff 0 0);
+    -webkit-mask-composite: xor;
+    mask-composite: exclude;
+    pointer-events: none;
+  }
+}
+
+.custom-brand-gradient::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-image: url("/assets/pattern.svg");
+  background-size: cover;
+  background-repeat: no-repeat;
+  background-position: center;
+  opacity: 0.1;
+  pointer-events: none;
+  z-index: 1;
+}
+
+.custom-brand-gradient > * {
+  position: relative;
+  z-index: 2;
+}
+
+/* Custom animation delays */
+.animation-delay-150 {
+  animation-delay: 150ms;
+}
+
+/* Hide Next.js dev indicator */
+[data-nextjs-dialog-overlay],
+[data-nextjs-toast],
+nextjs-portal {
+  display: none !important;
+}
