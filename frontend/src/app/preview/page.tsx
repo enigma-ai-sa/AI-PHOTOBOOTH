@@ -40,8 +40,8 @@ export default function Preview() {
 
   if (isLoading) {
     return (
-      <div className="h-screen bg-white flex items-center justify-center">
-        <p className="text-2xl text-gray-600">Loading preview...</p>
+      <div className="h-dvh w-full max-w-[1080px] mx-auto bg-white flex items-center justify-center aspect-[9/16]">
+        <p className="text-xl sm:text-2xl text-gray-600">Loading preview...</p>
       </div>
     );
   }
@@ -51,13 +51,13 @@ export default function Preview() {
   }
 
   return (
-    <div className="h-screen bg-white p-12 overflow-hidden flex w-full flex-col">
-      {/* Image container - centered */}
-      <div className="relative w-full mx-auto flex-1 flex items-center justify-center">
-        <div className="rounded-[40px] overflow-hidden border-8 border-gradient-green-end w-full aspect-[3/2] relative">
+    <div className="h-dvh w-full max-w-[1080px] mx-auto bg-white p-3 sm:p-4 lg:p-6 overflow-hidden flex flex-col aspect-[9/16]">
+      {/* Image container - takes most of the space */}
+      <div className="relative w-full flex-1 flex items-center justify-center min-h-0">
+        <div className="rounded-2xl sm:rounded-3xl lg:rounded-[40px] overflow-hidden border-4 sm:border-6 lg:border-8 border-gradient-green-end w-full h-full relative">
           {imageError ? (
             <div className="w-full h-full flex items-center justify-center bg-gray-200">
-              <p className="text-red-500 text-xl">Failed to load image</p>
+              <p className="text-red-500 text-lg sm:text-xl">Failed to load image</p>
             </div>
           ) : (
             <Image
@@ -75,23 +75,23 @@ export default function Preview() {
         </div>
       </div>
 
-      {/* Bottom controls - outside image container */}
-      <div className="w-full mx-auto grid grid-cols-2 gap-8 py-12 px-8">
-        <Button
-          onClick={handleRetake}
-          variant="tertiary"
-          size="large"
-          className="gap-8 !py-16 !text-5xl"
-        >
-          <FiRefreshCw size={70} /> Retake
-        </Button>
+      {/* Bottom controls - stacked vertically for portrait */}
+      <div className="w-full flex flex-col gap-2 sm:gap-3 py-4 sm:py-6 flex-shrink-0">
         <Button
           onClick={handleGenerate}
           variant="primary"
           size="large"
-          className="gap-8 !py-16 !text-5xl"
+          className="w-full gap-2 sm:gap-3 !py-4 sm:!py-5 lg:!py-6 !text-xl sm:!text-2xl lg:!text-3xl"
         >
-          <FiCheck size={70} /> Generate
+          <FiCheck className="w-6 h-6 sm:w-8 sm:h-8 lg:w-10 lg:h-10" /> Generate
+        </Button>
+        <Button
+          onClick={handleRetake}
+          variant="tertiary"
+          size="large"
+          className="w-full gap-2 sm:gap-3 !py-4 sm:!py-5 lg:!py-6 !text-xl sm:!text-2xl lg:!text-3xl"
+        >
+          <FiRefreshCw className="w-6 h-6 sm:w-8 sm:h-8 lg:w-10 lg:h-10" /> Retake
         </Button>
       </div>
     </div>

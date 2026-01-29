@@ -14,9 +14,10 @@ export default function Camera() {
   const [countdownNumber, setCountdownNumber] = useState(3);
 
   const takePhoto = useCallback(() => {
+    // Capture at 3:4 aspect ratio for portrait (1080x1440)
     const imageSrc = webcamRef.current?.getScreenshot({
-      width: 1920,
-      height: 1280,
+      width: 1080,
+      height: 1440,
     });
     
     if (imageSrc) {
@@ -62,31 +63,32 @@ export default function Camera() {
     }, 1000);
   }, [isCountingDown, isCapturing, takePhoto]);
 
+  // 3:4 aspect ratio for portrait mode camera
   const videoConstraints = {
     facingMode: "user",
-    width: { ideal: 1920 },
-    height: { ideal: 1280 },
-    aspectRatio: 3 / 2,
+    width: { ideal: 1080 },
+    height: { ideal: 1440 },
+    aspectRatio: 3 / 4,
   };
 
   
   return (
-    <div className="h-screen bg-white p-12 overflow-hidden flex w-full flex-col">
-      {/* Camera container - centered */}
-      <div className="relative w-full mx-auto flex-1 flex items-center justify-center">
-        <div className="rounded-[40px] overflow-hidden border-8 border-gradient-green-end w-full aspect-[3/2] relative">
+    <div className="h-dvh w-full max-w-[1080px] mx-auto bg-white p-3 sm:p-4 lg:p-6 overflow-hidden flex flex-col aspect-[9/16]">
+      {/* Camera container - takes most of the space */}
+      <div className="relative w-full flex-1 flex items-center justify-center min-h-0">
+        <div className="rounded-2xl sm:rounded-3xl lg:rounded-[40px] overflow-hidden border-4 sm:border-6 lg:border-8 border-gradient-green-end w-full h-full max-h-full relative">
           <Webcam
             audio={false}
             ref={webcamRef}
             screenshotFormat="image/jpeg"
             videoConstraints={videoConstraints}
-            className="w-full h-full object-cover transform -scale-x-100 rounded-[40px] overflow-hidden bg-stone-600"
+            className="w-full h-full object-cover transform -scale-x-100 bg-stone-600"
           />
 
           {isCountingDown && (
             <div className="absolute inset-0 flex items-center justify-center">
-              <div className="bg-gradient-green-end animate-pulse border-gradient-green-end border-14 border-bg-opacity-50 rounded-full w-80 h-80 flex items-center justify-center">
-                <div className="text-[12rem] font-bold text-white">
+              <div className="bg-gradient-green-end animate-pulse border-gradient-green-end border-8 sm:border-10 lg:border-14 border-bg-opacity-50 rounded-full w-32 h-32 sm:w-48 sm:h-48 lg:w-64 lg:h-64 flex items-center justify-center">
+                <div className="text-6xl sm:text-8xl lg:text-[10rem] font-bold text-white">
                   {countdownNumber}
                 </div>
               </div>
@@ -94,28 +96,27 @@ export default function Camera() {
           )}
 
           {isCapturing && (
-            <div className="absolute inset-0 bg-white opacity-80 rounded-[40px] flex items-center justify-center">
-              <div className="text-5xl font-bold text-purple-800">Captured!</div>
+            <div className="absolute inset-0 bg-white opacity-80 flex items-center justify-center">
+              <div className="text-2xl sm:text-3xl lg:text-4xl font-bold text-purple-800">Captured!</div>
             </div>
           )}
         </div>
       </div>
 
-      {/* Bottom controls - outside camera container */}
-      <div className="w-full mx-auto grid grid-cols-3 gap-8 py-12 px-8">
-        <button
-          onClick={() => router.push("/select-style")}
-          className="text-gradient-green-end text-6xl font-normal flex items-center gap-8"
-        >
-          <BiArrowBack size={70} /> Back
-        </button>
+      {/* Bottom controls - stacked vertically for portrait */}
+      <div className="w-full flex flex-col items-center gap-3 sm:gap-4 py-4 sm:py-6 flex-shrink-0">
         <button 
           onClick={startCountdown}
-          className="bg-gradient-green-end rounded-full p-12 text-white w-fit mx-auto hover:scale-105 transition-transform"
+          className="bg-gradient-green-end rounded-full p-4 sm:p-6 lg:p-8 text-white hover:scale-105 transition-transform"
         >
-          <IoCameraOutline size={140} />
+          <IoCameraOutline className="w-16 h-16 sm:w-20 sm:h-20 lg:w-24 lg:h-24" />
         </button>
-        <div></div> {/* Empty div to maintain grid spacing */}
+        <button
+          onClick={() => router.push("/select-style")}
+          className="text-gradient-green-end text-xl sm:text-2xl lg:text-3xl font-normal flex items-center gap-2 sm:gap-3"
+        >
+          <BiArrowBack className="w-6 h-6 sm:w-8 sm:h-8 lg:w-10 lg:h-10" /> Back
+        </button>
       </div>
     </div>
   );

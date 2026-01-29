@@ -121,14 +121,14 @@ body {
 @layer utilities {
   .border-gradient-blue-white {
     position: relative;
-    border-radius: 1.5rem; /* Match rounded-3xl from Tailwind */
+    border-radius: inherit;
   }
 
   .border-gradient-blue-white::before {
     content: "";
     position: absolute;
     inset: 0;
-    border-radius: 1.5rem;
+    border-radius: inherit;
     padding: 1px; /* Border width */
     background: linear-gradient(to bottom, #007B3A 0%, #ffffff 100%);
     -webkit-mask: linear-gradient(#ffffff 0 0) content-box,
@@ -140,14 +140,14 @@ body {
 
   .border-gradient-green-white {
     position: relative;
-    border-radius: 1.5rem;
+    border-radius: inherit;
   }
 
   .border-gradient-green-white::before {
     content: "";
     position: absolute;
     inset: 0;
-    border-radius: 1.5rem;
+    border-radius: inherit;
     padding: 1px;
     background: linear-gradient(to bottom, #007B3A 0%, #ffffff 100%);
     -webkit-mask: linear-gradient(#ffffff 0 0) content-box,

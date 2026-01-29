@@ -140,7 +140,7 @@ export default function Processing() {
         const formData = new FormData();
         formData.append("file", blob, "generated_image.png");
 
-        await fetch("http://127.0.0.1:8000/print", {
+        await fetch("http://127.0.0.1:5000/print", {
           method: "POST",
           body: formData,
         });
@@ -167,34 +167,34 @@ export default function Processing() {
   };
 
   return (
-    <div className="h-screen bg-white p-12 overflow-hidden flex w-full flex-col">
+    <div className="h-dvh w-full max-w-[1080px] mx-auto bg-white p-3 sm:p-4 lg:p-6 overflow-hidden flex flex-col aspect-[9/16]">
       {isLoading ? (
         /* Loading State - Full Screen */
-        <div className="flex-1 rounded-[40px] overflow-hidden border-8 border-gradient-green-end bg-stone-600 flex items-center justify-center">
-          <div className="text-center z-10">
-            <div className="mb-12">
+        <div className="flex-1 rounded-2xl sm:rounded-3xl lg:rounded-[40px] overflow-hidden border-4 sm:border-6 lg:border-8 border-gradient-green-end bg-stone-600 flex items-center justify-center">
+          <div className="text-center z-10 px-4">
+            <div className="mb-6 sm:mb-8 lg:mb-10">
               <div className="inline-block relative">
-                <div className="w-64 h-64 border-[20px] border-white border-t-gray-400 border-r-gray-400 rounded-full animate-spin"></div>
-                <div className="absolute inset-0 w-64 h-64 border-[20px] border-transparent border-r-white rounded-full animate-spin animation-delay-150"></div>
+                <div className="w-24 h-24 sm:w-32 sm:h-32 lg:w-40 lg:h-40 border-8 sm:border-12 lg:border-[16px] border-white border-t-gray-400 border-r-gray-400 rounded-full animate-spin"></div>
+                <div className="absolute inset-0 w-24 h-24 sm:w-32 sm:h-32 lg:w-40 lg:h-40 border-8 sm:border-12 lg:border-[16px] border-transparent border-r-white rounded-full animate-spin animation-delay-150"></div>
               </div>
             </div>
-            <p className="text-white text-5xl font-medium">
+            <p className="text-white text-xl sm:text-2xl lg:text-3xl font-medium">
               {retryCount > 0
-                ? `Your photo is being created... (${retryCount + 1}/3)`
-                : "Your photo is being created..."}
+                ? `Creating your photo... (${retryCount + 1}/3)`
+                : "Creating your photo..."}
             </p>
           </div>
         </div>
       ) : error ? (
         /* Error State */
-        <div className="flex-1 rounded-[40px] overflow-hidden border-8 border-gradient-green-end bg-stone-600 flex items-center justify-center p-8">
+        <div className="flex-1 rounded-2xl sm:rounded-3xl lg:rounded-[40px] overflow-hidden border-4 sm:border-6 lg:border-8 border-gradient-green-end bg-stone-600 flex items-center justify-center p-4">
           <div className="text-center">
-            <p className="text-red-400 mb-8 text-4xl">{error}</p>
+            <p className="text-red-400 mb-4 sm:mb-6 text-lg sm:text-xl lg:text-2xl">{error}</p>
             <Button
               onClick={() => generateImage(capturedImage!, 0)}
               variant="primary"
               size="large"
-              className="!py-12 !text-4xl"
+              className="!py-4 sm:!py-5 lg:!py-6 !text-lg sm:!text-xl lg:!text-2xl"
               disabled={isLoading}
             >
               {isLoading ? "Retrying..." : "Retry"}
@@ -202,14 +202,15 @@ export default function Processing() {
           </div>
         </div>
       ) : generatedImage ? (
-        /* Success State - Image + QR Code + Buttons */
-        <div className="flex-1 flex flex-col gap-8 overflow-hidden">
-          {/* Generated Image - Takes priority space */}
-          <div className="rounded-[40px] overflow-hidden border-8 border-gradient-green-end flex-shrink-0">
+        /* Success State - Image + QR Code + Buttons (Portrait Layout) */
+        <div className="flex-1 flex flex-col gap-3 sm:gap-4 overflow-auto">
+          {/* Generated Image - Sized to content */}
+          <div className="rounded-2xl sm:rounded-3xl lg:rounded-[40px] overflow-hidden border-4 sm:border-6 lg:border-8 border-gradient-green-end w-fit mx-auto">
             <img
               src={generatedImage}
               alt="AI generated photo"
-              className="w-full h-auto object-contain"
+              className="max-w-full h-auto object-contain"
+              style={{ maxHeight: "calc(100dvh - 280px)" }}
               onError={() => {
                 console.error("Failed to load generated image:", generatedImage);
                 setError("Failed to load the generated image. Please try again.");
@@ -220,60 +221,49 @@ export default function Processing() {
             />
           </div>
 
-          {/* Bottom Section - Button on left, QR on right */}
-          <div className="bg-gradient-light-green-white rounded-[40px] p-8 flex-shrink-0">
-            <p className="text-5xl font-normal text-center mb-6">
+          {/* Bottom Section - QR Code and Button stacked vertically */}
+          <div className="bg-gradient-light-green-white rounded-2xl sm:rounded-3xl p-3 sm:p-4 lg:p-5 flex-shrink-0">
+            {/* QR Code Section */}
+            {qrCode && (
+              <div className="flex items-center gap-3 sm:gap-4 mb-3 sm:mb-4">
+                <div className="bg-white rounded-xl sm:rounded-2xl p-2 sm:p-3 shadow-lg flex-shrink-0">
+                  <img
+                    src={qrCode}
+                    alt="QR Code to download your photo"
+                    className="w-24 h-24 sm:w-32 sm:h-32 lg:w-40 lg:h-40"
+                  />
+                </div>
+                <div className="text-gradient-green-end">
+                  <p className="text-xl sm:text-2xl lg:text-3xl font-medium mb-1">Scan to Download</p>
+                  <p className="text-sm sm:text-base lg:text-lg opacity-80">Save your photo to your phone</p>
+                </div>
+              </div>
+            )}
+
+            {/* Retake Button */}
+            <Button
+              onClick={handleStartOver}
+              variant="tertiary"
+              size="large"
+              className="w-full gap-2 sm:gap-3 !py-3 sm:!py-4 lg:!py-5 !text-lg sm:!text-xl lg:!text-2xl"
+            >
+              <IoRefreshOutline className="w-6 h-6 sm:w-7 sm:h-7 lg:w-8 lg:h-8" />
+              Retake Photo
+            </Button>
+
+            {/* Powered by text */}
+            <p className="text-base sm:text-lg font-normal text-center mt-2 sm:mt-3">
               <span className="text-black">Powered by </span>
               <span className="bg-gradient-to-r from-primary-purple-500 via-primary-light-blue-500 to-accent-green-500 bg-clip-text text-transparent font-medium">
                 enigma
               </span>
             </p>
-            <div className="flex items-center justify-between gap-12">
-              {/* Retake Button - Left */}
-              <Button
-                onClick={handleStartOver}
-                variant="tertiary"
-                size="large"
-                className="gap-8 !py-16 !px-16 !text-6xl"
-              >
-                <IoRefreshOutline size={80} />
-                Retake
-              </Button>
-
-              {/* Print Button - Commented out */}
-              {/* <Button
-                onClick={handlePrint}
-                variant="primary"
-                size="large"
-                className="gap-6 !py-14 !text-5xl"
-              >
-                <IoPrint size={60} />
-                Print Photo
-              </Button> */}
-
-              {/* QR Code - Right */}
-              {qrCode && (
-                <div className="flex items-center gap-16">
-                  <div className="text-gradient-green-end text-right">
-                    <p className="text-7xl font-medium mb-4">Scan to Download</p>
-                    <p className="text-4xl opacity-80">Save your photo to your phone</p>
-                  </div>
-                  <div className="bg-white rounded-3xl p-8 shadow-xl">
-                    <img
-                      src={qrCode}
-                      alt="QR Code to download your photo"
-                      className="w-[450px] h-[450px]"
-                    />
-                  </div>
-                </div>
-              )}
-            </div>
           </div>
         </div>
       ) : (
         /* Waiting State */
-        <div className="flex-1 rounded-[40px] overflow-hidden border-8 border-gradient-green-end bg-stone-600 flex items-center justify-center">
-          <p className="text-gray-300 text-4xl">Waiting...</p>
+        <div className="flex-1 rounded-2xl sm:rounded-3xl lg:rounded-[40px] overflow-hidden border-4 sm:border-6 lg:border-8 border-gradient-green-end bg-stone-600 flex items-center justify-center">
+          <p className="text-gray-300 text-xl sm:text-2xl">Waiting...</p>
         </div>
       )}
 

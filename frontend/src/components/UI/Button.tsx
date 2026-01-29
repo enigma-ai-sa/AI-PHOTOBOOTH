@@ -19,7 +19,7 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     ref
   ) => {
     const baseStyles =
-      "font-bold rounded-3xl transition-all duration-200 flex items-center justify-center font-normal overflow-hidden";
+      "font-bold rounded-xl sm:rounded-2xl lg:rounded-3xl transition-all duration-200 flex items-center justify-center font-normal overflow-hidden";
 
     const variantStyles = {
       primary:
@@ -31,9 +31,9 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
     };
 
     const sizeStyles = {
-      small: "px-6 py-2 text-sm",
-      medium: "px-8 py-3 text-base",
-      large: "px-10 py-14 text-5xl",
+      small: "px-4 py-2 text-sm",
+      medium: "px-6 py-3 text-base sm:text-lg",
+      large: "px-6 sm:px-8 lg:px-10 py-4 sm:py-5 lg:py-6 text-lg sm:text-xl lg:text-2xl",
     };
 
     return (
