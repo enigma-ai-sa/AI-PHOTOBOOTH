@@ -26,10 +26,10 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "No option provided" }, { status: 400 });
     }
 
-    console.log(`🎨 Sending image to Flask backend for generation using option: ${option}...`);
+    console.log(`🎨 Sending image to FastAPI backend for generation using option: ${option}...`);
     console.log(`⏱️ Backend timeout set to ${BACKEND_TIMEOUT}ms`);
 
-    // Call Flask backend with the unified endpoint
+    // Call FastAPI backend with the unified endpoint
     // Backend now returns S3 URL instead of base64 (~200 bytes vs ~10MB response)
     const response = await fetch(`${BACKEND_URL}/image-generator`, {
       method: "POST",
