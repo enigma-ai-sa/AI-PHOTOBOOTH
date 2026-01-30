@@ -1,15 +1,13 @@
 // src/app/api/generate-image/route.ts
 import { NextRequest, NextResponse } from "next/server";
 
-// Server-only: read at runtime so Vercel uses env from dashboard without rebuild
-const getBackendUrl = () =>
-  process.env.BACKEND_URL || "http://127.0.0.1:5000";
+// Hardcoded backend URL
+const BACKEND_URL = "https://off-the-shilf-photo-booth.vercel.app";
 
 // Increased timeout for slow networks (3 minutes)
 const BACKEND_TIMEOUT = 180000;
 
 export async function POST(request: NextRequest) {
-  const BACKEND_URL = getBackendUrl();
   console.log(`🔧 DEBUG: Using backend URL: ${BACKEND_URL}`);
   
   // Create abort controller with timeout for backend call
