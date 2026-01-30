@@ -40,6 +40,11 @@ app.add_middleware(
 # Add GZip compression for responses > 1KB (significant bandwidth savings)
 app.add_middleware(GZipMiddleware, minimum_size=1000)
 
+# Health check / root endpoint
+@app.get("/")
+async def root():
+    return {"status": "ok", "message": "AI Photo Booth Backend API"}
+
 # CONFIGURATIONS
 
 # s3 bucket
