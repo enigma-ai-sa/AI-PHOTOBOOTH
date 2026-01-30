@@ -1,10 +1,9 @@
 "use client";
 
 import Button from "@/components/UI/Button";
-import PrintCopiesModal from "@/components/PrintCopiesModal";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
-import { IoPrint, IoRefreshOutline } from "react-icons/io5";
+import { IoCheckmarkCircleOutline, IoRefreshOutline } from "react-icons/io5";
 
 export default function Processing() {
   const [capturedImage, setCapturedImage] = useState<string | null>(null);
@@ -13,8 +12,6 @@ export default function Processing() {
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [retryCount, setRetryCount] = useState(0);
-  const [showPrintModal, setShowPrintModal] = useState(false);
-  const [printCopies, setPrintCopies] = useState(1);
   const hasStartedGenerationRef = useRef(false);
   const router = useRouter();
 
@@ -121,48 +118,8 @@ export default function Processing() {
     router.push("/select-style");
   };
 
-  const handlePrint = () => {
-    if (!generatedImage) return;
-    setShowPrintModal(true);
-  };
-
-  const handleConfirmPrint = async () => {
-    if (!generatedImage) return;
-
-    try {
-      // Fetch the image once
-      const response = await fetch(generatedImage);
-      const blob = await response.blob();
-
-      // Print multiple copies by making multiple API calls
-      for (let i = 0; i < printCopies; i++) {
-        const formData = new FormData();
-        formData.append("file", blob, "generated_image.png");
-
-        await fetch("http://127.0.0.1:5000/print", {
-          method: "POST",
-          body: formData,
-        });
-      }
-    } catch (error) {
-      console.error("Print failed:", error);
-    }
-
-    setShowPrintModal(false);
+  const handleDone = () => {
     router.push("/thank-you");
-  };
-
-  const handleIncrementCopies = () => {
-    setPrintCopies((prev) => Math.min(prev + 1, 10));
-  };
-
-  const handleDecrementCopies = () => {
-    setPrintCopies((prev) => Math.max(prev - 1, 1));
-  };
-
-  const handleCancelPrint = () => {
-    setShowPrintModal(false);
-    setPrintCopies(1);
   };
 
   return (
@@ -266,13 +223,13 @@ export default function Processing() {
                     Retake
                   </Button>
                   <Button
-                    onClick={handlePrint}
+                    onClick={handleDone}
                     variant="primary"
                     size="large"
                     className="gap-4"
                   >
-                    <IoPrint />
-                    Print Photo
+                    <IoCheckmarkCircleOutline />
+                    Done
                   </Button>
                 </div>
               </div>
@@ -284,15 +241,6 @@ export default function Processing() {
           )}
         </div>
       </div>
-
-      <PrintCopiesModal
-        isOpen={showPrintModal}
-        copies={printCopies}
-        onIncrement={handleIncrementCopies}
-        onDecrement={handleDecrementCopies}
-        onConfirm={handleConfirmPrint}
-        onCancel={handleCancelPrint}
-      />
     </div>
   );
 }
