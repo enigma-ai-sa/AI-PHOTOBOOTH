@@ -1,7 +1,7 @@
 // src/app/api/generate-image/route.ts
 import { NextRequest, NextResponse } from "next/server";
 
-// Hardcoded backend URL
+// Hardcoded backend URL (Vercel picks up redeploy on push)
 const BACKEND_URL = "https://off-the-shilf-photo-booth.vercel.app";
 
 // Increased timeout for slow networks (3 minutes)
