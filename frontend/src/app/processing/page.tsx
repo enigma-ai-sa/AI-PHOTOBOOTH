@@ -4,10 +4,14 @@ import Button from "@/components/UI/Button";
 import { useImageStream } from "@/hooks/useImageStream";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
-import { IoCheckmarkCircleOutline, IoRefreshOutline } from "react-icons/io5";
+import { IoCheckmarkCircleOutline, IoRefreshOutline, IoPrintOutline } from "react-icons/io5";
+
+
 
 export default function Processing() {
   const [capturedImage, setCapturedImage] = useState<string | null>(null);
+  const [isPrinting, setIsPrinting] = useState(false);
+  const [printError, setPrintError] = useState<string | null>(null);
   const hasStartedGenerationRef = useRef(false);
   const router = useRouter();
 
@@ -67,6 +71,43 @@ export default function Processing() {
     router.push("/thank-you");
   };
 
+  const handlePrint = async () => {
+    if (!currentImage) return;
+    
+    setIsPrinting(true);
+    setPrintError(null);
+    
+    try {
+      // Convert base64 data URL to blob
+      const response = await fetch(currentImage);
+      const blob = await response.blob();
+      
+      // Create FormData with the image file
+      const formData = new FormData();
+      formData.append('file', blob, 'photo.png');
+      
+      const printResponse = await fetch('http://localhost:8000/print', {
+        method: 'POST',
+        body: formData,
+      });
+      
+      if (!printResponse.ok) {
+        const errorData = await printResponse.json().catch(() => ({}));
+        if (printResponse.status === 402) {
+          throw new Error(errorData.detail || 'Payment failed');
+        }
+        throw new Error(errorData.detail || 'Print failed');
+      }
+      
+      // Success - navigate to thank you page
+      router.push('/thank-you');
+    } catch (err) {
+      setPrintError(err instanceof Error ? err.message : 'Print failed');
+    } finally {
+      setIsPrinting(false);
+    }
+  };
+
   // Determine loading text based on state
   const getLoadingText = () => {
     if (error) return null;
@@ -117,7 +158,7 @@ export default function Processing() {
               {/* Image Section - Centered */}
               <div className="flex-1 flex items-center justify-center min-h-0">
                 {/* Image Section - 3:2 Aspect Ratio */}
-                <div className="w-full max-w-6xl aspect-[3/2] rounded-xl overflow-hidden">
+                <div className="w-full max-w-6xl aspect-[2/3] rounded-xl overflow-hidden">
                   <img
                     src={currentImage}
                     alt="AI generated photo"
@@ -151,13 +192,14 @@ export default function Processing() {
                     Retake
                   </Button>
                   <Button
-                    onClick={handleDone}
+                    onClick={handlePrint}
                     variant="primary"
                     size="large"
                     className="gap-4"
+                    disabled={isPrinting}
                   >
-                    <IoCheckmarkCircleOutline />
-                    Done
+                    <IoPrintOutline />
+                    {isPrinting ? "Processing Payment..." : "Print"}
                   </Button>
                 </div>
               </div>
@@ -165,7 +207,7 @@ export default function Processing() {
           ) : isLoading || currentImage ? (
             <div className="relative w-full h-full flex items-center justify-center">
               {/* Container with same size as final image */}
-              <div className="w-full max-w-6xl aspect-[3/2] rounded-xl overflow-hidden bg-stone-600 relative">
+              <div className="w-full max-w-6xl aspect-[2/3] rounded-xl overflow-hidden bg-stone-600 relative">
                 {currentImage ? (
                   <>
                     {/* The streaming image with blur/opacity transitions */}

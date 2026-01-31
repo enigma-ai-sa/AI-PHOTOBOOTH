@@ -14,6 +14,8 @@ import uuid
 import json
 import boto3
 import qrcode
+from starlette.concurrency import run_in_threadpool
+from eftpos import get_client # payments
 
 # Conditional Windows imports
 if sys.platform == "win32":
@@ -22,7 +24,8 @@ if sys.platform == "win32":
     from PIL import ImageWin
 
 # GLOBAL VARIABLES
-QRCODE = True
+QRCODE = False
+PRINT_PRICE_HALALAH = 30000 # print price in halalah
 
 load_dotenv()
 
@@ -110,8 +113,20 @@ async def generate_stream(
 
     # Read the uploaded image
     image_data = await image.read()
-    image_file = io.BytesIO(image_data)
+    
+    # Rotate the image 90° clockwise
+    pil_image = Image.open(io.BytesIO(image_data))
+    pil_image = pil_image.transpose(Image.Transpose.ROTATE_180)
+    
+    # # Save for debugging
+    # pil_image.save(f"references/{image.filename}")
+    
+    # Convert rotated image back to BytesIO for OpenAI
+    image_file = io.BytesIO()
+    pil_image.save(image_file, format="PNG")
+    image_file.seek(0)  # Reset to beginning
     image_file.name = image.filename or "upload.png"
+    
     image_list = [image_file]
 
     # Add cached reference images
@@ -262,6 +277,28 @@ if sys.platform == "win32":
         
         filename = f"print_job_{uuid.uuid4().hex}.png"
         save_path = os.path.join(UPLOAD_FOLDER, filename)
+
+        # 1. Process payment first
+        try:
+            eftpos_client = get_client()
+            payment_result = await run_in_threadpool(
+                eftpos_client.perform_purchase,
+                PRINT_PRICE_HALALAH,  # Use hardcoded amount
+                None,  # com_port - uses default
+                None,  # timeout_sec - uses default
+                None,  # charset - uses default
+            )
+            print(f"Payment result: {payment_result}")
+            
+            # Check if payment was successful
+            # Adjust this condition based on what your DLL returns for success
+            if "APPROVED" not in str(payment_result).upper():
+                raise HTTPException(status_code=402, detail=f"Payment failed: {payment_result}")
+                
+        except HTTPException:
+            raise
+        except Exception as e:
+            raise HTTPException(status_code=500, detail=f"Payment error: {str(e)}")
         
         try:
             # 1. Save the file

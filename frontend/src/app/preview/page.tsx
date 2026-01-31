@@ -48,12 +48,12 @@ export default function Preview() {
     <div className="h-screen bg-white p-8 overflow-hidden flex w-full flex-col">
       {/* Image container - centered */}
       <div className="relative w-full max-w-6xl mx-auto flex-1 flex items-center justify-center">
-        <div className="rounded-3xl overflow-hidden border-4 border-gradient-blue-end w-full aspect-[3/2] relative">
+        <div className="rounded-3xl overflow-hidden border-4 border-gradient-blue-end w-full aspect-[2/3] relative">
           <Image
             src={capturedImage}
             alt="Captured photo"
             fill
-            className="object-cover transform -scale-x-100"
+            className="object-cover transform -scale-x-100 rotate-180"
             unoptimized
           />
         </div>

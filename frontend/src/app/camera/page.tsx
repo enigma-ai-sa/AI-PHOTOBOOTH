@@ -36,8 +36,13 @@ export default function Camera() {
             throw new Error("Failed to get canvas context");
           }
 
-          canvas.width = img.width;
-          canvas.height = img.height;
+          // Swap dimensions for 90° rotation
+          canvas.width = img.height;
+          canvas.height = img.width;
+
+          // Rotate 90 degrees clockwise
+          ctx.translate(canvas.width, 0);
+          ctx.rotate(Math.PI / 2);  // 90 degrees clockwise
 
           // Draw image on canvas (this ensures RGBA format)
           ctx.drawImage(img, 0, 0);
@@ -104,9 +109,9 @@ export default function Camera() {
 
   const videoConstraints = {
     facingMode: "user",
-    width: { ideal: 6000 },
-    height: { ideal: 4000 },
-    aspectRatio: 3 / 2, // Canon EOS R50 photo aspect ratio
+    width: { ideal: 4000 },
+    height: { ideal: 6000 },
+    aspectRatio: 2 / 3, // Canon EOS R50 photo aspect ratio
   };
 
   
@@ -114,13 +119,13 @@ export default function Camera() {
     <div className="h-screen bg-white p-8 overflow-hidden flex w-full flex-col">
       {/* Camera container - centered */}
       <div className="relative w-full max-w-6xl mx-auto flex-1 flex items-center justify-center">
-        <div className="rounded-3xl overflow-hidden border-4 border-gradient-blue-end w-full aspect-[3/2] relative">
+        <div className="rounded-3xl overflow-hidden border-4 border-gradient-blue-end w-full aspect-[2/3] relative">
           <Webcam
             audio={false}
             ref={webcamRef}
             screenshotFormat="image/png"
             videoConstraints={videoConstraints}
-            className="w-full h-full object-cover transform -scale-x-100 rounded-3xl overflow-hidden bg-stone-600"
+            className="absolute inset-0 min-w-[150%] min-h-[100%] object-cover transform -scale-x-100 rotate-90 bg-stone-600"
           />
 
           {isCountingDown && (
