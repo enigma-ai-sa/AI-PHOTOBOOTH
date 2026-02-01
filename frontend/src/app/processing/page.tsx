@@ -2,6 +2,7 @@
 
 import Button from "@/components/UI/Button";
 import PrintCopiesModal from "@/components/PrintCopiesModal";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 import { IoRefreshOutline } from "react-icons/io5";
@@ -268,12 +269,15 @@ export default function Processing() {
         /* Success State - Image + QR Code + Buttons (Portrait Layout) */
         <div className="flex-1 flex flex-col gap-3 sm:gap-4 overflow-auto">
           {/* Generated Image - Sized to content */}
-          <div className="rounded-2xl sm:rounded-3xl lg:rounded-[40px] overflow-hidden border-4 sm:border-6 lg:border-8 border-gradient-green-end w-fit mx-auto">
-            <img
+          <div className="rounded-2xl sm:rounded-3xl lg:rounded-[40px] overflow-hidden border-4 sm:border-6 lg:border-8 border-gradient-green-end w-fit mx-auto relative">
+            <Image
               src={generatedImage}
               alt="AI generated photo"
+              width={1024}
+              height={1536}
               className="max-w-full h-auto object-contain"
               style={{ maxHeight: "calc(100dvh - 280px)" }}
+              unoptimized
               onError={() => {
                 console.error("Failed to load generated image:", generatedImage);
                 setError("Failed to load the generated image. Please try again.");
@@ -291,10 +295,13 @@ export default function Processing() {
             {qrCode && (
               <div className="flex items-center gap-3 sm:gap-4 mb-3 sm:mb-4">
                 <div className="bg-white rounded-xl sm:rounded-2xl p-2 sm:p-3 shadow-lg flex-shrink-0">
-                  <img
+                  <Image
                     src={qrCode}
                     alt="QR Code to download your photo"
+                    width={160}
+                    height={160}
                     className="w-24 h-24 sm:w-32 sm:h-32 lg:w-40 lg:h-40"
+                    unoptimized
                   />
                 </div>
                 <div className="text-gradient-green-end">

@@ -59,6 +59,11 @@ app.add_middleware(
 # Add GZip compression for responses > 1KB (significant bandwidth savings)
 app.add_middleware(GZipMiddleware, minimum_size=1000)
 
+# Health check / root endpoint
+@app.get("/")
+async def root():
+    return {"status": "ok", "message": "AI Photo Booth Backend API"}
+
 # CONFIGURATIONS
 
 # s3 bucket
@@ -183,6 +188,7 @@ async def get_event_prompt(event_slug: str, option_key: str):
     except Exception as e:
         print(f"⚠️ Failed to get event prompt: {e}")
         return None, None, None
+
 
 @app.post("/generate-stream")
 async def generate_stream(
@@ -623,4 +629,3 @@ if sys.platform == "win32":
 
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=5000)
-
