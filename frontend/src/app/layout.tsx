@@ -1,9 +1,10 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
+import { AuthProvider } from "@/contexts/AuthContext";
 
 export const metadata: Metadata = {
   title: "AI Photobooth",
-  description: "Create AI-generated photos at the King Faisal Specialist Hospital",
+  description: "Multi-tenant AI Photobooth for events and conferences",
 };
 
 export const viewport: Viewport = {
@@ -22,7 +23,9 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className="antialiased min-h-dvh bg-white flex items-center justify-center">
-        {children}
+        <AuthProvider>
+          {children}
+        </AuthProvider>
       </body>
     </html>
   );

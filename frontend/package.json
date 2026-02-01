@@ -9,6 +9,8 @@
     "lint": "eslint"
   },
   "dependencies": {
+    "@supabase/ssr": "^0.8.0",
+    "@supabase/supabase-js": "^2.93.3",
     "canvas": "^3.2.0",
     "dotenv": "^17.2.3",
     "next": "15.5.4",

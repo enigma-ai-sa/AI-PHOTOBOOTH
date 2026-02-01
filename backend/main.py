@@ -27,7 +27,26 @@ QRCODE = True
 
 load_dotenv()
 
-app = FastAPI()
+app = FastAPI(title="AI Photobooth API", version="2.0.0")
+
+# Import routers for multi-tenant support
+try:
+    from routers.events import router as events_router
+    from routers.prompts import router as prompts_router
+    from supabase_client import get_supabase
+    
+    app.include_router(events_router, prefix="/api")
+    app.include_router(prompts_router, prefix="/api")
+    MULTI_TENANT_ENABLED = True
+except ImportError as e:
+    print(f"Multi-tenant features not available: {e}")
+    MULTI_TENANT_ENABLED = False
+
+# OpenAI pricing per image (as of 2024)
+COST_PER_IMAGE = {
+    "gpt-image-1": 0.04,      # $0.04 per image (1024x1024)
+    "gpt-image-1.5": 0.08,    # $0.08 per image (higher quality)
+}
 
 app.add_middleware(
     CORSMiddleware,
@@ -110,6 +129,60 @@ def load_reference_images():
                         })
 
 load_reference_images()
+
+
+async def log_image_generation(event_id: str, prompt_id: str, model: str, image_url: str, processing_time: int, qr_url: str = None):
+    """Log generated image to database for cost tracking"""
+    if not MULTI_TENANT_ENABLED:
+        return
+    
+    try:
+        supabase = get_supabase()
+        cost = COST_PER_IMAGE.get(model, 0.04)
+        
+        supabase.table("generated_images").insert({
+            "event_id": event_id,
+            "prompt_id": prompt_id,
+            "generated_image_url": image_url,
+            "qr_code_url": qr_url,
+            "model_used": model,
+            "estimated_cost": cost,
+            "processing_time_ms": processing_time
+        }).execute()
+        
+        print(f"📊 Logged image generation: cost=${cost}, time={processing_time}ms")
+    except Exception as e:
+        print(f"⚠️ Failed to log image generation: {e}")
+
+
+async def get_event_prompt(event_slug: str, option_key: str):
+    """Get prompt from database for multi-tenant events"""
+    if not MULTI_TENANT_ENABLED:
+        return None, None, None
+    
+    try:
+        supabase = get_supabase()
+        
+        # Get event by slug
+        event_result = supabase.table("events").select("id").eq("slug", event_slug).eq("is_active", True).single().execute()
+        
+        if not event_result.data:
+            return None, None, None
+        
+        event_id = event_result.data["id"]
+        
+        # Get prompt for this event
+        prompt_result = supabase.table("event_prompts").select("*").eq("event_id", event_id).eq("option_key", option_key).eq("is_active", True).single().execute()
+        
+        if not prompt_result.data:
+            return None, None, None
+        
+        prompt_data = prompt_result.data
+        return event_id, prompt_data["id"], prompt_data["prompt_text"]
+        
+    except Exception as e:
+        print(f"⚠️ Failed to get event prompt: {e}")
+        return None, None, None
 
 @app.post("/generate-stream")
 async def generate_stream(
@@ -226,13 +299,20 @@ async def generate_stream(
 async def generate_image_json(request_data: dict):
     """
     Non-streaming endpoint for image generation.
-    Accepts JSON: { "image": "base64_string", "option": "ghibli|studio|2026|HNY" }
+    Accepts JSON: { 
+        "image": "base64_string", 
+        "option": "bluebrains|mecno2026|...",
+        "eventSlug": "optional-event-slug"  # For multi-tenant mode
+    }
     Returns JSON: { "imageUrl": "s3_url", "qrCode": "base64_string" }
     
     OPTIMIZED: Returns S3 URL instead of base64 to reduce response size from ~10MB to ~200 bytes
     """
+    start_time = time.time()
+    
     image_base64 = request_data.get("image")
     option = request_data.get("option")
+    event_slug = request_data.get("eventSlug")  # Multi-tenant support
     
     if not image_base64:
         raise HTTPException(status_code=400, detail="No image provided")
@@ -240,8 +320,21 @@ async def generate_image_json(request_data: dict):
     if not option:
         raise HTTPException(status_code=400, detail="No option provided")
     
-    if option not in options:
-        raise HTTPException(status_code=400, detail=f"Invalid option: {option}. Valid options: {list(options.keys())}")
+    # Multi-tenant: try to get prompt from database
+    event_id = None
+    prompt_id = None
+    prompt = None
+    
+    if event_slug and MULTI_TENANT_ENABLED:
+        event_id, prompt_id, prompt = await get_event_prompt(event_slug, option)
+        if prompt:
+            print(f"🏢 Using event-specific prompt for event: {event_slug}")
+    
+    # Fallback to legacy options if no event prompt found
+    if not prompt:
+        if option not in options:
+            raise HTTPException(status_code=400, detail=f"Invalid option: {option}. Valid options: {list(options.keys())}")
+        prompt = options[option]["prompt"]
     
     try:
         # Decode base64 image (handle data URL format)
@@ -254,19 +347,18 @@ async def generate_image_json(request_data: dict):
         image_file.name = "upload.png"
         image_list = [image_file]
         
-        # Add cached reference images if available
-        if "_cached_refs" in options[option]:
+        # Add cached reference images if available (legacy mode only)
+        if option in options and "_cached_refs" in options[option]:
             for ref in options[option]["_cached_refs"]:
                 ref_file = io.BytesIO(ref["data"])
                 ref_file.name = ref["name"]
                 image_list.append(ref_file)
         
-        prompt = options[option]["prompt"]
-        
         # Call OpenAI (non-streaming)
+        model_used = "gpt-image-1"
         print(f"🎨 Generating image with option: {option}")
         response = client.images.edit(
-            model="gpt-image-1",
+            model=model_used,
             image=image_list,
             prompt=prompt,
             size="1024x1536",
@@ -281,16 +373,24 @@ async def generate_image_json(request_data: dict):
         
         print("✅ Image generated successfully")
         
-        # ALWAYS upload to S3 and return URL (optimized for slow networks)
+        # Determine storage path based on event
         bucket_name = os.getenv('S3_BUCKET_NAME')
         region = os.getenv('S3_REGION')
         
         if not bucket_name or not region:
             raise HTTPException(status_code=500, detail="S3 not configured - required for optimized delivery")
         
-        # Upload to S3
+        # Upload to S3 with event-organized path
         image_bytes_out = base64.b64decode(generated_image_b64)
-        filename = f"{key}/{int(time.time())}_{uuid.uuid4().hex[:8]}.png"
+        
+        if event_slug:
+            # Multi-tenant: organize by event
+            from datetime import datetime
+            date_str = datetime.now().strftime("%Y-%m-%d")
+            filename = f"events/{event_slug}/{date_str}/{int(time.time())}_{uuid.uuid4().hex[:8]}.png"
+        else:
+            # Legacy mode
+            filename = f"{key}/{int(time.time())}_{uuid.uuid4().hex[:8]}.png"
         
         s3.put_object(
             Bucket=bucket_name,
@@ -311,6 +411,20 @@ async def generate_image_json(request_data: dict):
                 print("📱 QR code generated")
             except Exception as qr_err:
                 print(f"⚠️ QR error (non-fatal): {qr_err}")
+        
+        # Calculate processing time
+        processing_time_ms = int((time.time() - start_time) * 1000)
+        
+        # Log to database for cost tracking (multi-tenant mode)
+        if event_id:
+            await log_image_generation(
+                event_id=event_id,
+                prompt_id=prompt_id,
+                model=model_used,
+                image_url=s3_url,
+                processing_time=processing_time_ms,
+                qr_url=qr_code_b64
+            )
         
         # Return URL instead of base64 (~200 bytes vs ~10MB)
         return {
@@ -350,6 +464,57 @@ def generate_qr_code(url: str) -> str:
 @app.get("/options")
 async def get_options():
     return {"options": list[str](options.keys())}
+
+
+# Dashboard stats endpoint
+@app.get("/api/dashboard/stats")
+async def get_dashboard_stats():
+    """Get overall dashboard statistics"""
+    if not MULTI_TENANT_ENABLED:
+        return {
+            "total_events": 0,
+            "active_events": 0,
+            "total_images": 0,
+            "total_cost": 0,
+            "recent_images": []
+        }
+    
+    try:
+        supabase = get_supabase()
+        
+        # Get events count
+        events_result = supabase.table("events").select("id, is_active").execute()
+        events = events_result.data or []
+        total_events = len(events)
+        active_events = len([e for e in events if e.get("is_active")])
+        
+        # Get images stats
+        images_result = supabase.table("generated_images").select("id, estimated_cost, created_at, generated_image_url, event_id").order("created_at", desc=True).limit(10).execute()
+        images = images_result.data or []
+        
+        # Get total count and cost
+        all_images_result = supabase.table("generated_images").select("estimated_cost").execute()
+        all_images = all_images_result.data or []
+        
+        total_images = len(all_images)
+        total_cost = sum(img.get("estimated_cost", 0) or 0 for img in all_images)
+        
+        return {
+            "total_events": total_events,
+            "active_events": active_events,
+            "total_images": total_images,
+            "total_cost": round(total_cost, 4),
+            "recent_images": images
+        }
+    except Exception as e:
+        print(f"Failed to get dashboard stats: {e}")
+        return {
+            "total_events": 0,
+            "active_events": 0,
+            "total_images": 0,
+            "total_cost": 0,
+            "recent_images": []
+        }
 
 # the test.html page
 @app.get("/test")

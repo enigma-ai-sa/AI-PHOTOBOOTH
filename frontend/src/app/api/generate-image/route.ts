@@ -1,7 +1,7 @@
 // src/app/api/generate-image/route.ts
 import { NextRequest, NextResponse } from "next/server";
 
-const BACKEND_URL = process.env.NEXT_PUBLIC_BACKEND_URL || "http://127.0.0.1:5000";
+const BACKEND_URL = process.env.BACKEND_URL || "http://127.0.0.1:5000";
 
 // Increased timeout for slow networks (3 minutes)
 const BACKEND_TIMEOUT = 180000;
@@ -14,7 +14,7 @@ export async function POST(request: NextRequest) {
   const timeoutId = setTimeout(() => controller.abort(), BACKEND_TIMEOUT);
   
   try {
-    const { image, option } = await request.json();
+    const { image, option, eventSlug } = await request.json();
 
     if (!image) {
       clearTimeout(timeoutId);
@@ -27,10 +27,12 @@ export async function POST(request: NextRequest) {
     }
 
     console.log(`🎨 Sending image to Flask backend for generation using option: ${option}...`);
+    console.log(`🏢 Event slug: ${eventSlug || 'none (legacy mode)'}`);
     console.log(`⏱️ Backend timeout set to ${BACKEND_TIMEOUT}ms`);
 
     // Call Flask backend with the unified endpoint
     // Backend now returns S3 URL instead of base64 (~200 bytes vs ~10MB response)
+    // Include eventSlug for multi-tenant support
     const response = await fetch(`${BACKEND_URL}/image-generator`, {
       method: "POST",
       headers: {
@@ -39,6 +41,7 @@ export async function POST(request: NextRequest) {
       body: JSON.stringify({
         image: image,
         option: option,
+        eventSlug: eventSlug || undefined,  // Pass event slug for multi-tenant
       }),
       signal: controller.signal,
     });
