@@ -2,6 +2,7 @@
 
 import { useState } from 'react'
 import { useRouter } from 'next/navigation'
+import Link from 'next/link'
 import { useAuth } from '@/contexts/AuthContext'
 import Button from '@/components/UI/Button'
 
@@ -91,9 +92,9 @@ export default function LoginPage() {
         </form>
 
         <div className="mt-6 text-center">
-          <a href="/events" className="text-sm text-gray-500 hover:text-gradient-green-end">
+          <Link href="/events" className="text-sm text-gray-500 hover:text-gradient-green-end">
             Go to Public Events
-          </a>
+          </Link>
         </div>
       </div>
     </div>
