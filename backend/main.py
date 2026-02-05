@@ -1,5 +1,7 @@
 import base64
 from openai import OpenAI
+from google import genai
+from google.genai import types
 from fastapi import FastAPI, UploadFile, File, HTTPException, Form
 from fastapi.responses import Response, HTMLResponse, StreamingResponse
 from fastapi.middleware.cors import CORSMiddleware
@@ -54,34 +56,64 @@ client = OpenAI(
 
 
 options = {
-    "ghibli": {
+    "trophy": {
         "prompt": """
-        Create a full-body shot of the person(s) in the provided photo in a semi-realisticStudio Ghibli style.
-        Set the background to AlUla mountains which is provided as a reference image, it should be night time, with stars visible.
+        Generate a photorealistic, high-resolution vertical portrait of the person from the provided input image. 
+        CRITICAL INSTRUCTION - POSE CHANGE Modify the subject's pose: You must ignore whatever pose the person is doing and substitute it with the following new action. New Action: The subject must be holding the large golden trophy cup up with both hands, exactly as shown in the Generation Reference Images. The hands should grasp the base or stem of the trophy, lifting it in a celebratory manner. 
+        Subject Consistency (From Input Image): Identity: Strictly preserve the exact facial features, do not alter any facial features, resulting image facial features must match exactly with the input image. 
+        Clothing: Do not alter the clothing of the person in the input image, it must remain unchanged. 
+        Trophy & Reference Adherence: Trophy Design: The trophy must be the exact golden cup visible in the Generation Reference Images. It is a large, ornate gold cup with a lid and two prominent looped handles. Ensure the scale creates a sense of weight and prestige. 
+        Style & Lighting: Mimic the lighting and atmosphere of the Generation Reference Images. The scene is set at night under bright stadium ﬂoodlights. 
+        Setting & Location: The dirt track of a professional racecourse (King Abdulaziz Racecourse style). Background: Blurred stadium lights, dark night sky, and distant green railing/crowd elements, creating a cinematic depth of ﬁeld. 
+        Summary: Subject Face/Clothes = From Input Image. Pose/Trophy/Lighting = From Generation Reference Images.
         """,
-        "reference_images": ["./references/alula_mountains.png"]
+        "reference_images": ["./references/trophy.png"]
     },
-    "studio": {
+    "horse": {
         "prompt": """
-        Take the person(s) from the provided image and generate a Studio Portrait a blurred background of sparkles.
-        Ensure the person(s)' face and features remain completely unchanged. Keep the face untouched, only blur the background.
-        """
-    },
-    "2026": {
-        "prompt": """
-        Take the person(s) from the provided image and generate a hyper-realistic image of them with
-        the background displays a spectacular New Year's Eve atmosphere with a drone light show in the night sky explicitly spelling "2026", accompanied by elegant gold and silver fireworks. The scene is illuminated by the festival lights and starlight.
-        Ensure the person(s)' face and features remain completely unchanged. Keep the face untouched.
+        Photorealistic premium sports photograph.
+
+        PRIMARY GOAL (must prioritize): The rider is the SAME PERSON as the input portrait. Preserve the subject’s exact facial identity: facial proportions, eye shape/spacing, eyebrows, nose, lips, beard/mustache shape, skin tone. Do not stylize the face. Keep natural skin texture.
+
+        SCENE: The subject is racing as a professional jockey in the Saudi Cup at King Abdulaziz Racecourse at night under powerful stadium floodlights. Dynamic action, dirt flying from hooves, other horses slightly behind, background grandstands with motion blur to show speed.
+
+        COMPOSITION (identity lock): Tight 3/4 close-up action framing from the chest up while riding (telephoto sports shot). The subject’s face must be clearly visible, sharp, and well-lit. No motion blur on the face. Helmet allowed but MUST NOT cover key facial features. Keep visor up. NO goggles. No face coverings. Do not obscure the face with shadows; ensure floodlights illuminate the face.
+
+        WARDROBE (full replacement): Completely replace the original clothing with professional jockey racing silks matching Saudi Cup style. Outfit must match the outfit in the reference image exactly.
+
+        ACTION / HORSE: Subject is in a realistic racing crouch, hands on reins, riding a galloping thoroughbred racehorse. Horse anatomy must be realistic and proportionate. Add kicked-up dirt and subtle particles.
+
+        LIGHTING / CAMERA: Nighttime cinematic high-contrast stadium lighting, realistic reflections on helmet and satin silks. Shallow depth of field. Sports photography look (telephoto, fast shutter). Sharp subject, blurred background only.
+
+        QUALITY RULES (avoid common failures): No face morphing, no “generic” face, no extra fingers, no warped hands, no deformed horse legs, no melted logos, no unreadable text, no duplicated limbs, no plastic skin, no painterly or CGI look.
+
         """,
-        "reference_images": ["./references/alula_mountains.png"]
+        "reference_images": ["./references/horse.png"]
     },
-    "HNY": {
+    "card": {
         "prompt": """
-        Take the person(s) from the provided image and generate a hyper-realistic image of them with
-        the background displays a spectacular New Year's Eve atmosphere with a drone light show in the night sky explicitly spelling "Happy New Year from AlUla", accompanied by elegant gold and silver fireworks. The scene is illuminated by the festival lights and starlight.
-        Ensure the person(s)' face and features remain completely unchanged. Keep the face untouched.
+        Transform the subject from the input image into a luxury fashion illustration on a physical card, following the artistic style of the reference image but incorporating speciﬁc branding changes. 
+        1. Subject & Pose (From Input Image):  Illustrate the person in the input image. Maintain whatever pose is in the input image. 
+        Artistic Abstraction: As per the reference style, the face must remain completely blank/faceless (no eyes, nose, or mouth), drawing only the jawline and head shape. 
+        2. Artistic Style (From Reference Image): Mimic the mixed-media fashion croquis style: watercolor washes, Copic marker shading, and pencil outlines. The illustration should appear drawn on textured oﬀ-white/cream paper.   
+        3. CRITICAL FEEDBACK MODIFICATIONS (Must Implement): The Logo: Insure the logo is in the top right corner of the card in the output image, exactly the same as the reference image.
+        The Background: Place the card against a background representing The Saudi Cup (e.g., the architecture of the King Abdulaziz Racetrack, or a luxury equestrian atmosphere associated with the event). The background should be elegant   and blurred to keep focus on the card. 
+        Summary of Output: A vertical image of a hand-drawn fashion sketch of a faceless person on a card, featuring the Saudi Cup logo, set against a Saudi Cup themed background.
+
         """,
-        "reference_images": ["./references/alula_mountains.png"]
+        "reference_images": ["./references/card.png"]
+    },
+    "portrait": {
+        "prompt": """
+        Create a high-quality, hand-drawn oil painting portrait of the person from the input image. 
+        1. Subject & Likeness (From Input Image): Portray the person in the input image, do not alter any features. Maintain the poses from the input photo. 
+        CRITICAL CHANGE: Render a complete, detailed portrait of the persons face and expression as if a live artist were painting him in a studio. 
+        2. Art Style (Oil Painting): Adopt a classic oil painting style: Use visible brushstrokes, rich textures, and deep colors to mimic the look of a ﬁne art piece created on canvas. The lighting should be dramatic and elegant. 
+        3. Background & Composition: The image should be a full-frame painting.
+        Setting: Place the subject against a sophisticated, blurred background representing the atmosphere of The Saudi Cup (King Abdulaziz Racetrack). Use warm, architectural tones or equestrian hints in the background to establish the context without distracting from the portrait. 
+
+        """,
+        "reference_images": ["./references/portrait.png"]
     }
 }
 
@@ -239,8 +271,9 @@ async def get_options():
 # the test.html page
 @app.get("/test")
 async def test_page():
+    test_path = os.path.join(os.path.dirname(__file__), "test.html")
     return HTMLResponse(
-        open("test.html", encoding="utf-8").read()
+        open(test_path, encoding="utf-8").read()
     )
 
 # ------------------------PRINTING--------------------------------
