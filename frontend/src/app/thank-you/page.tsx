@@ -3,9 +3,11 @@
 import Button from "@/components/UI/Button";
 import { useRouter } from "next/navigation";
 import { GoHome } from "react-icons/go";
+import { useTranslation } from "@/i18n/useTranslation";
 
 export default function ThankYou() {
   const router = useRouter();
+  const { t } = useTranslation();
 
   const handleHomeScreen = () => {
     localStorage.removeItem("capturedImage");
@@ -19,12 +21,12 @@ export default function ThankYou() {
         <div className="h-30" />
 
         <div className="mx-auto text-center text-gradient-blue-end font-normal flex flex-col items-center gap-8">
-          <h1 className="font-medium text-[180px] leading-[1.1]">Thank You!</h1>
-          <h3 className="text-5xl">We hope you enjoyed your AI experience</h3>
+          <h1 className="font-medium text-[180px] leading-[1.1]">{t.thankYou.title}</h1>
+          <h3 className="text-5xl">{t.thankYou.subtitle}</h3>
         </div>
 
         <div className="mx-auto text-center text-gradient-blue-end w-full flex flex-col gap-6 font-normal">
-          <h3 className="text-4xl">Share your joy and come back soon!</h3>
+          <h3 className="text-4xl">{t.thankYou.shareMessage}</h3>
           <Button
             onClick={handleHomeScreen}
             variant="primary"
@@ -32,7 +34,7 @@ export default function ThankYou() {
             className="w-full flex items-center justify-center gap-4"
           >
             <GoHome size={46} />
-            Home Screen
+            {t.thankYou.homeButton}
           </Button>
         </div>
       </div>

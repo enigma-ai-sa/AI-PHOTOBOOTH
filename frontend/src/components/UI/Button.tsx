@@ -1,7 +1,7 @@
 import React from "react";
 
 interface ButtonProps extends React.ButtonHTMLAttributes<HTMLButtonElement> {
-  variant?: "primary" | "secondary" | "tertiary";
+  variant?: "primary" | "secondary" | "tertiary" | "saudi" | "saudi-outline" | "saudi-back";
   size?: "small" | "medium" | "large";
   children: React.ReactNode;
 }
@@ -28,6 +28,12 @@ const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
         "bg-white text-primary-purple-500 hover:bg-opacity-90 hover:scale-[1.02] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100",
       tertiary:
         "bg-white bg-opacity-20 text-gradient-blue-end border-2 border-gradient-blue-end disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100",
+      saudi:
+        "bg-saudi-gold text-saudi-green border-2 border-saudi-gold-dark rounded-2xl disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100",
+      "saudi-outline":
+        "bg-transparent text-saudi-gold border-2 border-saudi-gold rounded-2xl disabled:opacity-50 disabled:cursor-not-allowed",
+      "saudi-back":
+        "bg-transparent text-saudi-gold border-2 border-saudi-gold rounded-2xl disabled:opacity-50 disabled:cursor-not-allowed",
     };
 
     const sizeStyles = {

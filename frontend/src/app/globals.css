@@ -59,6 +59,16 @@
   --color-accent-green-500: #bad531;
   --color-accent-green-400: #dce995;
   --color-accent-green-300: #f9fcee;
+
+  /* Saudi Cup Theme */
+  --color-saudi-green: #011308;
+  --color-saudi-green-light: #1B3D2F;
+  --color-saudi-gold: #EBD36D;
+  --color-saudi-gold-dark: #D2B744;
+
+  /* Saudi Cup Card Colors */
+  --color-saudi-card-border: #2E4035;
+  --color-saudi-card-base: #17291D;
 }
 
 @media (prefers-color-scheme: dark) {
@@ -161,4 +171,20 @@ body {
   filter: blur(0);
   opacity: 1;
   transition: all 0.5s ease;
+}
+
+/* Fade in animation */
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.animate-fadeIn {
+  animation: fadeIn 0.5s ease-out forwards;
 }

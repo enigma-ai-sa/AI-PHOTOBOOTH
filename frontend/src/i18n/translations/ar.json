@@ -1,0 +1,48 @@
+{
+  "home": {
+    "tagline": "كُن جزءاً من الإرث",
+    "title": "تراثك، برؤية جديدة",
+    "titleLine2": "عبر الذكاء الإصطناعي",
+    "subtitle": "شاهد نفسك من خلال روح التميز في الفروسية السعودية",
+    "startButton": "ابدأ الآن"
+  },
+  "selectStyle": {
+    "title": "إختر أسلوبك",
+    "back": "رجوع",
+    "next": "التالي"
+  },
+  "camera": {
+    "back": "رجوع",
+    "captured": "تم الإلتقاط!"
+  },
+  "preview": {
+    "retry": "إعادة المحاولة",
+    "generate": "تنفيذ"
+  },
+  "processing": {
+    "processingMessage": "جاري معالجة صورتك ...",
+    "refiningImage": "جاري تحسين الصورة...",
+    "generatingQR": "جاري إنشاء رمز QR...",
+    "scanQRCode": "إمسح",
+    "qrCodeHighlight": "رمز QR",
+    "toGetArtwork": "للحصول على عملك الفني",
+    "thankYouMessage": "شكراً لمشاركتنا هذه التجربة",
+    "retake": "إعادة التقاط",
+    "backToHome": "العودة للشاشة الرئيسية",
+    "poweredBy": "من صنع",
+    "retry": "إعادة المحاولة",
+    "retrying": "جاري إعادة المحاولة..."
+  },
+  "thankYou": {
+    "title": "شكراً لك!",
+    "subtitle": "نأمل أنك استمتعت بتجربة الذكاء الإصطناعي",
+    "shareMessage": "شارك سعادتك وعد قريباً!",
+    "homeButton": "الشاشة الرئيسية"
+  },
+  "imageOptions": {
+    "oil-painting": "صورة شخصية بنمط اللوحة الزيتية",
+    "fashion-illustration": "رسم توضيحي للموضة (التركيز على الزي)",
+    "riding-horse": "ركوب الخيل بملابس السباق الرسمية",
+    "holding-trophy": "حمل كأس السعودية"
+  }
+}
