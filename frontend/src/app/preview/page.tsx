@@ -5,13 +5,15 @@ import { useAspectRatio } from "@/hooks/useAspectRatio";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
-import { FiCheck, FiRefreshCw } from "react-icons/fi";
+import { FiRotateCcw, FiArrowRight } from "react-icons/fi";
+import { useTranslation } from "@/i18n/useTranslation";
 
 export default function Preview() {
   const router = useRouter();
   const [capturedImage, setCapturedImage] = useState<string>("");
   const [endpoint, setEndpoint] = useState<string>("");
   const { tailwindClass } = useAspectRatio();
+  const { t, isRTL } = useTranslation();
 
   useEffect(() => {
     // Get captured image and endpoint from localStorage
@@ -47,38 +49,63 @@ export default function Preview() {
   }
 
   return (
-    <div className="h-screen bg-white p-8 overflow-hidden flex w-full flex-col">
-      {/* Image container - centered */}
-      <div className="relative w-full max-w-6xl mx-auto flex-1 flex items-center justify-center">
-        <div className={`rounded-3xl overflow-hidden border-4 border-gradient-blue-end w-full ${tailwindClass} relative`}>
-          <Image
-            src={capturedImage}
-            alt="Captured photo"
-            fill
-            className="object-cover transform -scale-x-100"
-            unoptimized
-          />
-        </div>
-      </div>
+    <div className="h-screen bg-saudi-green overflow-hidden flex w-full flex-col relative">
+      {/* Background pattern overlay */}
+      <div
+        className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-30 pointer-events-none"
+        style={{ backgroundImage: "url('/assets/saudiBgPattern.png')" }}
+      />
 
-      {/* Bottom controls - outside image container */}
-      <div className="w-full max-w-6xl mx-auto grid grid-cols-2 gap-4 py-6 px-6">
-        <Button
-          onClick={handleRetake}
-          variant="tertiary"
-          size="large"
-          className="gap-6"
-        >
-          <FiRefreshCw size={50} /> Retake
-        </Button>
-        <Button
-          onClick={handleGenerate}
-          variant="primary"
-          size="large"
-          className="gap-6"
-        >
-          <FiCheck size={50} /> Generate
-        </Button>
+      {/* Content wrapper */}
+      <div className="relative z-10 flex flex-col h-full">
+        {/* Header with logos */}
+        <header className="flex justify-between items-center py-6 px-9">
+          <Image
+            src="/assets/enigmaLogo.svg"
+            alt="Enigma"
+            width={240}
+            height={60}
+          />
+          <Image
+            src="/assets/saudiCupLogo.svg"
+            alt="Saudi Cup 2026"
+            width={160}
+            height={40}
+          />
+        </header>
+
+        {/* Image container - centered */}
+        <div className="relative w-full max-w-6xl mx-auto flex-1 flex items-center justify-center px-8">
+          <div
+            className={`rounded-[25px] overflow-hidden border-4 border-saudi-gold w-full ${tailwindClass}`}
+          >
+            <img
+              src={capturedImage}
+              alt="Captured photo"
+              className="w-full h-full object-cover transform -scale-x-100"
+            />
+          </div>
+        </div>
+
+        {/* Bottom controls */}
+        <div className="w-full max-w-6xl mx-auto grid grid-cols-2 gap-4 py-6 px-9">
+          <Button
+            onClick={handleRetake}
+            variant="saudi-outline"
+            size="large"
+            className="gap-6"
+          >
+            <FiRotateCcw size={50} /> {t.preview.retry}
+          </Button>
+          <Button
+            onClick={handleGenerate}
+            variant="saudi"
+            size="large"
+            className="gap-6"
+          >
+            {t.preview.generate} <FiArrowRight size={50} className={isRTL ? "-scale-x-100" : ""} />
+          </Button>
+        </div>
       </div>
     </div>
   );

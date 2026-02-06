@@ -1,17 +1,18 @@
 "use client";
 
 import Button from "@/components/UI/Button";
-import { useAspectRatio } from "@/hooks/useAspectRatio";
 import { useImageStream } from "@/hooks/useImageStream";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
-import { IoCheckmarkCircleOutline, IoRefreshOutline } from "react-icons/io5";
+import { IoRefreshOutline } from "react-icons/io5";
+import { useTranslation } from "@/i18n/useTranslation";
 
 export default function Processing() {
   const [capturedImage, setCapturedImage] = useState<string | null>(null);
   const hasStartedGenerationRef = useRef(false);
   const router = useRouter();
-  const { tailwindClass } = useAspectRatio();
+  const { t } = useTranslation();
 
   const {
     currentImage,
@@ -61,117 +62,146 @@ export default function Processing() {
     startStream(capturedImage, option);
   };
 
-  const handleStartOver = () => {
+  const handleRetake = () => {
     router.push("/select-style");
   };
 
-  const handleDone = () => {
-    router.push("/thank-you");
+  const handleBackToHome = () => {
+    localStorage.removeItem("capturedImage");
+    localStorage.removeItem("selectedOption");
+    router.push("/");
   };
-
-  // Determine loading text based on state
-  const getLoadingText = () => {
-    if (error) return null;
-    if (imageType === "partial") return "Refining image...";
-    if (imageType === "final" && !qrCode) return "Generating QR code...";
-    if (!currentImage) return "Your New Year's photo is being created...";
-    return null;
-  };
-
-  const loadingText = getLoadingText();
 
   return (
-    <div className="h-screen bg-white p-8 overflow-hidden flex w-full flex-col">
-      <div className="relative w-full h-full mx-auto flex-1 flex flex-col">
-        <div className="rounded-3xl overflow-hidden border-4 border-gradient-blue-end w-full flex-1">
+    <div className="h-screen bg-saudi-green p-8 overflow-hidden flex w-full flex-col relative">
+      {/* Background Pattern Overlay */}
+      <div
+        className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-30 pointer-events-none"
+        style={{ backgroundImage: "url('/assets/saudiBgPattern.png')" }}
+      />
+
+      <div className="w-full h-full flex flex-col relative z-10">
+        {/* Header with Logos */}
+        <header className="flex justify-between items-center py-6 px-9">
+          <Image
+            src="/assets/enigmaLogo.svg"
+            alt="Enigma"
+            width={240}
+            height={60}
+          />
+          <Image
+            src="/assets/saudiCupLogo.svg"
+            alt="Saudi Cup 2026"
+            width={160}
+            height={40}
+          />
+        </header>
+
+        {/* Main content area */}
+        <div className="flex-1 flex flex-col min-h-0 px-9">
           {error ? (
-            <div className="relative w-full h-full bg-stone-600 flex items-center justify-center p-4 mx-auto">
-              <div className="text-center mx-auto">
-                <p className="text-red-400 mb-4 text-2xl">{error}</p>
-                <Button
-                  onClick={handleRetry}
-                  variant="primary"
-                  size="medium"
-                  disabled={isLoading}
-                >
-                  {isLoading ? "Retrying..." : "Retry"}
-                </Button>
+            /* Error state */
+            <div className="flex-1 flex flex-col">
+              <div className="flex-1 rounded-[25px] border-4 border-saudi-gold bg-[#2a2a2a] flex items-center justify-center">
+                <div className="text-center p-8">
+                  <p className="text-red-400 mb-4 text-2xl">{error}</p>
+                  <Button
+                    onClick={handleRetry}
+                    variant="saudi"
+                    size="medium"
+                    disabled={isLoading}
+                  >
+                    {isLoading ? t.processing.retrying : t.processing.retry}
+                  </Button>
+                </div>
               </div>
             </div>
           ) : isComplete && currentImage ? (
-            <div className="w-full h-full flex flex-col p-6 relative">
-              {/* QR Code Section - Top Right Corner */}
-              {qrCode && (
-                <div className="absolute top-0 right-4 z-10">
-                  <div className="bg-white rounded-xl shadow-lg flex flex-col items-center gap-2">
-                    <img
-                      src={qrCode}
-                      alt="QR Code to download your photo"
-                      className="w-64 h-64"
-                    />
-                    <p className="text-sm font-medium text-gray-700 text-center">
-                      Scan to download
-                    </p>
-                  </div>
-                </div>
-              )}
-
-              {/* Image Section - Centered */}
-              <div className="flex-1 flex items-center justify-center min-h-0">
-                {/* Image Section - 3:2 Aspect Ratio */}
-                <div
-                  className={`w-full max-w-6xl ${tailwindClass} rounded-xl overflow-hidden`}
-                >
-                  <img
-                    src={currentImage}
-                    alt="AI generated photo"
-                    className="w-full h-full object-cover image-ready"
-                    onError={() => {
-                      console.error(
-                        "Failed to load generated image:",
-                        currentImage,
-                      );
-                    }}
-                  />
-                </div>
+            /* Complete state - show image, QR, and buttons */
+            <div className="flex-1 flex flex-col min-h-0 gap-6">
+              {/* Image container - takes available space */}
+              <div className="flex-1 min-h-0 rounded-[25px] border-4 border-saudi-gold overflow-hidden">
+                <img
+                  src={currentImage}
+                  alt="AI generated photo"
+                  className="w-full h-full object-cover image-ready"
+                  onError={() => {
+                    console.error(
+                      "Failed to load generated image:",
+                      currentImage,
+                    );
+                  }}
+                />
               </div>
 
-              {/* Buttons Section - White Background - At Bottom */}
-              <div className="bg-white py-10 px-6 rounded-3xl space-y-4 shadow-md mt-6">
-                <p className="text-3xl font-normal text-center">
-                  <span className="text-black">Powered by </span>
-                  <span className="bg-gradient-to-r from-primary-purple-500 via-primary-light-blue-500 to-accent-green-500 bg-clip-text text-transparent font-medium">
+              {/* Content below image - fades in */}
+              <div className="flex-shrink animate-fadeIn flex flex-col justify-center pt-6 overflow-hidden">
+                {/* Powered by enigma */}
+                <div className="flex items-center justify-center mb-6 gap-2">
+                  <span className="text-white text-3xl">
+                    {t.processing.poweredBy}{" "}
+                  </span>
+                  <span className="bg-gradient-to-r from-primary-purple-500 via-primary-light-blue-500 to-accent-green-500 bg-clip-text text-transparent font-medium text-3xl">
                     enigma
                   </span>
-                </p>
-                <div className="grid grid-cols-2 gap-4">
+                </div>
+
+                {/* QR Section */}
+                {qrCode && (
+                  <div className="flex items-stretch justify-between my-10">
+                    <div className="flex flex-col justify-between">
+                      <div className="grid gap-2">
+                        <h2 className="text-6xl text-white">
+                          {t.processing.scanQRCode}{" "}
+                          <span className="text-saudi-gold">
+                            {t.processing.qrCodeHighlight}
+                          </span>
+                        </h2>
+                        <p className="text-white/70 text-5xl">
+                          {t.processing.toGetArtwork}
+                        </p>
+                      </div>
+                      {/* Thank you text - positioned under QR text */}
+                      <p className="text-white/70 text-2xl mt-auto">
+                        {t.processing.thankYouMessage}
+                      </p>
+                    </div>
+
+                    <div className="bg-white p-6 rounded-[80px]">
+                      <img
+                        src={qrCode}
+                        alt="QR Code to download your photo"
+                        className="w-120 h-120"
+                      />
+                    </div>
+                  </div>
+                )}
+
+                {/* Buttons */}
+                <div className="grid grid-cols-2 gap-4 mt-4">
                   <Button
-                    onClick={handleStartOver}
-                    variant="tertiary"
+                    onClick={handleRetake}
+                    variant="saudi-outline"
                     size="large"
-                    className="gap-4"
+                    className="gap-3"
                   >
                     <IoRefreshOutline />
-                    Retake
+                    {t.processing.retake}
                   </Button>
                   <Button
-                    onClick={handleDone}
-                    variant="primary"
+                    onClick={handleBackToHome}
+                    variant="saudi"
                     size="large"
-                    className="gap-4"
                   >
-                    <IoCheckmarkCircleOutline />
-                    Done
+                    {t.processing.backToHome}
                   </Button>
                 </div>
               </div>
             </div>
-          ) : isLoading || currentImage ? (
-            <div className="relative w-full h-full flex items-center justify-center">
-              {/* Container with same size as final image */}
-              <div
-                className={`w-full max-w-6xl ${tailwindClass} rounded-xl overflow-hidden bg-stone-600 relative`}
-              >
+          ) : (
+            /* Loading state - with or without partial image */
+            <div className="flex-1 flex flex-col min-h-0">
+              <div className="flex-1 rounded-[25px] border-4 border-saudi-gold overflow-hidden bg-[#2a2a2a] relative">
                 {currentImage ? (
                   <>
                     {/* The streaming image with blur/opacity transitions */}
@@ -191,14 +221,14 @@ export default function Processing() {
                         <div className="text-center">
                           <div className="mb-6">
                             <div className="inline-block relative">
-                              <div className="w-20 h-20 border-8 border-white border-t-gray-400 border-r-gray-400 rounded-full animate-spin"></div>
+                              <div className="w-20 h-20 border-8 border-saudi-gold border-t-saudi-gold/30 border-r-saudi-gold/30 rounded-full animate-spin"></div>
                             </div>
                           </div>
-                          {loadingText && (
-                            <p className="text-white text-2xl font-medium">
-                              {loadingText}
-                            </p>
-                          )}
+                          <p className="text-white text-2xl font-medium">
+                            {imageType === "partial"
+                              ? t.processing.refiningImage
+                              : t.processing.generatingQR}
+                          </p>
                         </div>
                       </div>
                     )}
@@ -206,27 +236,12 @@ export default function Processing() {
                 ) : (
                   /* Initial loading state with no image yet */
                   <div className="absolute inset-0 flex items-center justify-center">
-                    <div className="text-center">
-                      <div className="mb-6">
-                        <div className="inline-block relative">
-                          <div className="w-45 h-45 border-15 border-white border-t-gray-400 border-r-gray-400 rounded-full animate-spin"></div>
-                          <div className="absolute inset-0 w-45 h-45 border-15 border-transparent border-r-white rounded-full animate-spin animation-delay-150"></div>
-                        </div>
-                      </div>
-
-                      <div className="space-y-2">
-                        <p className="text-white text-4xl font-medium">
-                          {loadingText}
-                        </p>
-                      </div>
-                    </div>
+                    <p className="text-white/70 text-3xl">
+                      {t.processing.processingMessage}
+                    </p>
                   </div>
                 )}
               </div>
-            </div>
-          ) : (
-            <div className="relative w-full h-full bg-stone-600 flex items-center justify-center">
-              <p className="text-gray-300 text-lg">Waiting...</p>
             </div>
           )}
         </div>

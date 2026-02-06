@@ -1,11 +1,13 @@
 "use client";
 
 import { useAspectRatio } from "@/hooks/useAspectRatio";
+import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useCallback, useRef, useState } from "react";
 import { BiArrowBack } from "react-icons/bi";
 import { IoCameraOutline } from "react-icons/io5";
 import Webcam from "react-webcam";
+import { useTranslation } from "@/i18n/useTranslation";
 
 export default function Camera() {
   const webcamRef = useRef<Webcam>(null);
@@ -14,6 +16,7 @@ export default function Camera() {
   const [isCountingDown, setIsCountingDown] = useState(false);
   const [countdownNumber, setCountdownNumber] = useState(3);
   const { tailwindClass, videoConstraintRatio } = useAspectRatio();
+  const { t, isRTL } = useTranslation();
 
   const takePhoto = useCallback(() => {
     const imageSrc = webcamRef.current?.getScreenshot();
@@ -21,7 +24,7 @@ export default function Camera() {
       setIsCapturing(true);
 
       // Convert to RGBA format using canvas with error handling
-      const img = new Image();
+      const img = new window.Image();
       let timeoutId: NodeJS.Timeout; // eslint-disable-line prefer-const
 
       const cleanup = () => {
@@ -50,7 +53,7 @@ export default function Camera() {
         } catch (error) {
           console.warn(
             "Canvas processing failed, using original image:",
-            error
+            error,
           );
           // Fallback to original image
           localStorage.setItem("capturedImage", imageSrc);
@@ -111,50 +114,80 @@ export default function Camera() {
     ...(videoConstraintRatio && { aspectRatio: videoConstraintRatio }),
   };
 
-  
   return (
-    <div className="h-screen bg-white p-8 overflow-hidden flex w-full flex-col">
-      {/* Camera container - centered */}
-      <div className="relative w-full max-w-6xl mx-auto flex-1 flex items-center justify-center">
-        <div className={`rounded-3xl overflow-hidden border-4 border-gradient-blue-end w-full ${tailwindClass} relative`}>
-          <Webcam
-            audio={false}
-            ref={webcamRef}
-            screenshotFormat="image/png"
-            videoConstraints={videoConstraints}
-            className="w-full h-full object-cover transform -scale-x-100 rounded-3xl overflow-hidden bg-stone-600"
-          />
+    <div className="h-screen bg-saudi-green p-8 overflow-hidden flex w-full flex-col relative">
+      {/* Background Pattern Overlay */}
+      <div
+        className="absolute inset-0 bg-cover bg-center bg-no-repeat opacity-30 pointer-events-none"
+        style={{ backgroundImage: "url('/assets/saudiBgPattern.png')" }}
+      />
 
-          {isCountingDown && (
-            <div className="absolute inset-0 flex items-center justify-center">
-              <div className="bg-gradient-blue-end animate-pulse border-gradieny-blue-endborder-14 border-bg-opacity-50 rounded-full w-62 h-62 flex items-center justify-center">
-                <div className="text-9xl font-bold text-white">
-                  {countdownNumber}
+      <div className="w-full h-full flex flex-col relative z-10">
+        {/* Header with Logos */}
+        <header className="flex justify-between items-center py-6 px-9">
+          <Image
+            src="/assets/enigmaLogo.svg"
+            alt="Enigma"
+            width={240}
+            height={60}
+          />
+          <Image
+            src="/assets/saudiCupLogo.svg"
+            alt="Saudi Cup 2026"
+            width={160}
+            height={40}
+          />
+        </header>
+
+        {/* Camera container - centered */}
+        <div className="relative w-full max-w-6xl mx-auto flex-1 flex items-center justify-center">
+          <div
+            className={`rounded-[25px] overflow-hidden border-4 border-saudi-gold w-full ${tailwindClass} relative`}
+          >
+            <Webcam
+              audio={false}
+              ref={webcamRef}
+              screenshotFormat="image/png"
+              videoConstraints={videoConstraints}
+              className="w-full h-full object-cover transform -scale-x-100 rounded-[25px] overflow-hidden bg-stone-600"
+            />
+
+            {isCountingDown && (
+              <div className="absolute inset-0 flex items-center justify-center">
+                <div className="bg-saudi-green animate-pulse border-4 border-saudi-gold rounded-full w-48 h-48 flex items-center justify-center">
+                  <div className="text-9xl font-bold text-saudi-gold">
+                    {countdownNumber}
+                  </div>
                 </div>
               </div>
-            </div>
-          )}
+            )}
 
-          {isCapturing && (
-            <div className="absolute inset-0 bg-white opacity-80 rounded-3xl flex items-center justify-center">
-              <div className="text-2xl font-bold text-purple-800">Captured!</div>
-            </div>
-          )}
+            {isCapturing && (
+              <div className="absolute inset-0 bg-saudi-gold opacity-80 rounded-[25px] flex items-center justify-center">
+                <div className="text-2xl font-bold text-saudi-green">
+                  {t.camera.captured}
+                </div>
+              </div>
+            )}
+          </div>
         </div>
-      </div>
 
-      {/* Bottom controls - outside camera container */}
-      <div className="w-full max-w-6xl mx-auto grid grid-cols-3 gap-4 py-6 px-6">
-        <button
-          onClick={() => router.push("/select-style")}
-          className="text-gradient-blue-end text-5xl font-normal flex items-center gap-6"
-        >
-          <BiArrowBack /> Back
-        </button>
-        <button className="bg-gradient-blue-end rounded-full p-8 text-white w-fit mx-auto">
-          <IoCameraOutline size={90} onClick={startCountdown} />
-        </button>
-        <div></div> {/* Empty div to maintain grid spacing */}
+        {/* Bottom controls - outside camera container */}
+        <div className="w-full max-w-6xl mx-auto grid grid-cols-3 gap-4 py-6 px-6">
+          <button
+            onClick={() => router.push("/select-style")}
+            className="text-saudi-gold text-5xl font-normal flex items-center gap-6"
+          >
+            <BiArrowBack className={isRTL ? "-scale-x-100" : ""} /> {t.camera.back}
+          </button>
+          <button
+            onClick={startCountdown}
+            className="bg-saudi-gold rounded-full p-6 text-saudi-green w-fit mx-auto hover:bg-saudi-gold-dark transition-colors"
+          >
+            <IoCameraOutline size={90} />
+          </button>
+          <div></div> {/* Empty div to maintain grid spacing */}
+        </div>
       </div>
     </div>
   );

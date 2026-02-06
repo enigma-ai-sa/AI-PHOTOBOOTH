@@ -60,7 +60,7 @@ export const ASPECT_RATIOS: Record<AspectRatioKey, AspectRatioConfig> = {
 };
 
 // ====== CHANGE THIS TO SWITCH ASPECT RATIO ======
-export const CURRENT_ASPECT_RATIO: AspectRatioKey = "3:2";
+export const CURRENT_ASPECT_RATIO: AspectRatioKey = "full-height";
 
 // Helper functions
 export const getAspectRatioConfig = () => ASPECT_RATIOS[CURRENT_ASPECT_RATIO];

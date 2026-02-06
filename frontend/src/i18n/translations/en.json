@@ -1,0 +1,48 @@
+{
+  "home": {
+    "tagline": "Be Part of the Legacy",
+    "title": "Your Heritage,",
+    "titleLine2": "Reimagined by AI",
+    "subtitle": "See yourself through the spirit of Saudi equestrian excellence",
+    "startButton": "Start Now"
+  },
+  "selectStyle": {
+    "title": "Choose Your Style",
+    "back": "Back",
+    "next": "Next"
+  },
+  "camera": {
+    "back": "Back",
+    "captured": "Captured!"
+  },
+  "preview": {
+    "retry": "Retry",
+    "generate": "Generate"
+  },
+  "processing": {
+    "processingMessage": "Your photo is being processed ...",
+    "refiningImage": "Refining image...",
+    "generatingQR": "Generating QR code...",
+    "scanQRCode": "Scan",
+    "qrCodeHighlight": "QR Code",
+    "toGetArtwork": "to get your artwork",
+    "thankYouMessage": "Thank you for sharing our experience",
+    "retake": "Retake",
+    "backToHome": "Back to Home Screen",
+    "poweredBy": "Powered by",
+    "retry": "Retry",
+    "retrying": "Retrying..."
+  },
+  "thankYou": {
+    "title": "Thank You!",
+    "subtitle": "We hope you enjoyed your AI experience",
+    "shareMessage": "Share your joy and come back soon!",
+    "homeButton": "Home Screen"
+  },
+  "imageOptions": {
+    "oil-painting": "Oil Painting Style Portrait",
+    "fashion-illustration": "Fashion Illustration (Outfit Focus)",
+    "riding-horse": "Riding The Horse in Official Racing Gear",
+    "holding-trophy": "Holding The Saudi Cup Trophy"
+  }
+}
