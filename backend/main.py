@@ -74,19 +74,13 @@ options = {
         Photorealistic premium sports photograph.
 
         PRIMARY GOAL (must prioritize): The rider is the SAME PERSON as the input portrait. Preserve the subject’s exact facial identity: facial proportions, eye shape/spacing, eyebrows, nose, lips, beard/mustache shape, skin tone. Do not stylize the face. Keep natural skin texture.
-
+        Insure that the face is extactly the same as the input image, no alterations, no changes, it must remain the same exact face as the input.
         SCENE: The subject is racing as a professional jockey in the Saudi Cup at King Abdulaziz Racecourse at night under powerful stadium floodlights. Dynamic action, dirt flying from hooves, other horses slightly behind, background grandstands with motion blur to show speed.
-
         COMPOSITION (identity lock): Tight 3/4 close-up action framing from the chest up while riding (telephoto sports shot). The subject’s face must be clearly visible, sharp, and well-lit. No motion blur on the face. Helmet allowed but MUST NOT cover key facial features. Keep visor up. NO goggles. No face coverings. Do not obscure the face with shadows; ensure floodlights illuminate the face.
-
         WARDROBE (full replacement): Completely replace the original clothing with professional jockey racing silks matching Saudi Cup style. Outfit must match the outfit in the reference image exactly.
-
         ACTION / HORSE: Subject is in a realistic racing crouch, hands on reins, riding a galloping thoroughbred racehorse. Horse anatomy must be realistic and proportionate. Add kicked-up dirt and subtle particles.
-
         LIGHTING / CAMERA: Nighttime cinematic high-contrast stadium lighting, realistic reflections on helmet and satin silks. Shallow depth of field. Sports photography look (telephoto, fast shutter). Sharp subject, blurred background only.
-
         QUALITY RULES (avoid common failures): No face morphing, no “generic” face, no extra fingers, no warped hands, no deformed horse legs, no melted logos, no unreadable text, no duplicated limbs, no plastic skin, no painterly or CGI look.
-
         """,
         "reference_images": ["./references/horse.png"]
     },
