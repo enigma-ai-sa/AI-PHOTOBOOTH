@@ -1,6 +1,7 @@
 "use client";
 
 import Button from "@/components/UI/Button";
+import { useAspectRatio } from "@/hooks/useAspectRatio";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
@@ -10,6 +11,7 @@ export default function Preview() {
   const router = useRouter();
   const [capturedImage, setCapturedImage] = useState<string>("");
   const [endpoint, setEndpoint] = useState<string>("");
+  const { tailwindClass } = useAspectRatio();
 
   useEffect(() => {
     // Get captured image and endpoint from localStorage
@@ -48,7 +50,7 @@ export default function Preview() {
     <div className="h-screen bg-white p-8 overflow-hidden flex w-full flex-col">
       {/* Image container - centered */}
       <div className="relative w-full max-w-6xl mx-auto flex-1 flex items-center justify-center">
-        <div className="rounded-3xl overflow-hidden border-4 border-gradient-blue-end w-full aspect-[3/2] relative">
+        <div className={`rounded-3xl overflow-hidden border-4 border-gradient-blue-end w-full ${tailwindClass} relative`}>
           <Image
             src={capturedImage}
             alt="Captured photo"

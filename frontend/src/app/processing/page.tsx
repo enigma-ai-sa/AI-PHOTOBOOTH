@@ -1,6 +1,7 @@
 "use client";
 
 import Button from "@/components/UI/Button";
+import { useAspectRatio } from "@/hooks/useAspectRatio";
 import { useImageStream } from "@/hooks/useImageStream";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
@@ -10,6 +11,7 @@ export default function Processing() {
   const [capturedImage, setCapturedImage] = useState<string | null>(null);
   const hasStartedGenerationRef = useRef(false);
   const router = useRouter();
+  const { tailwindClass } = useAspectRatio();
 
   const {
     currentImage,
@@ -117,7 +119,9 @@ export default function Processing() {
               {/* Image Section - Centered */}
               <div className="flex-1 flex items-center justify-center min-h-0">
                 {/* Image Section - 3:2 Aspect Ratio */}
-                <div className="w-full max-w-6xl aspect-[3/2] rounded-xl overflow-hidden">
+                <div
+                  className={`w-full max-w-6xl ${tailwindClass} rounded-xl overflow-hidden`}
+                >
                   <img
                     src={currentImage}
                     alt="AI generated photo"
@@ -125,7 +129,7 @@ export default function Processing() {
                     onError={() => {
                       console.error(
                         "Failed to load generated image:",
-                        currentImage
+                        currentImage,
                       );
                     }}
                   />
@@ -165,7 +169,9 @@ export default function Processing() {
           ) : isLoading || currentImage ? (
             <div className="relative w-full h-full flex items-center justify-center">
               {/* Container with same size as final image */}
-              <div className="w-full max-w-6xl aspect-[3/2] rounded-xl overflow-hidden bg-stone-600 relative">
+              <div
+                className={`w-full max-w-6xl ${tailwindClass} rounded-xl overflow-hidden bg-stone-600 relative`}
+              >
                 {currentImage ? (
                   <>
                     {/* The streaming image with blur/opacity transitions */}

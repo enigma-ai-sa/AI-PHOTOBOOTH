@@ -1,5 +1,6 @@
 "use client";
 
+import { useAspectRatio } from "@/hooks/useAspectRatio";
 import { useRouter } from "next/navigation";
 import { useCallback, useRef, useState } from "react";
 import { BiArrowBack } from "react-icons/bi";
@@ -12,6 +13,7 @@ export default function Camera() {
   const [isCapturing, setIsCapturing] = useState(false);
   const [isCountingDown, setIsCountingDown] = useState(false);
   const [countdownNumber, setCountdownNumber] = useState(3);
+  const { tailwindClass, videoConstraintRatio } = useAspectRatio();
 
   const takePhoto = useCallback(() => {
     const imageSrc = webcamRef.current?.getScreenshot();
@@ -106,7 +108,7 @@ export default function Camera() {
     facingMode: "user",
     width: { ideal: 6000 },
     height: { ideal: 4000 },
-    aspectRatio: 3 / 2, // Canon EOS R50 photo aspect ratio
+    ...(videoConstraintRatio && { aspectRatio: videoConstraintRatio }),
   };
 
   
@@ -114,7 +116,7 @@ export default function Camera() {
     <div className="h-screen bg-white p-8 overflow-hidden flex w-full flex-col">
       {/* Camera container - centered */}
       <div className="relative w-full max-w-6xl mx-auto flex-1 flex items-center justify-center">
-        <div className="rounded-3xl overflow-hidden border-4 border-gradient-blue-end w-full aspect-[3/2] relative">
+        <div className={`rounded-3xl overflow-hidden border-4 border-gradient-blue-end w-full ${tailwindClass} relative`}>
           <Webcam
             audio={false}
             ref={webcamRef}
