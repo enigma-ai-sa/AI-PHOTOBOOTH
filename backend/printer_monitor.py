@@ -303,6 +303,51 @@ This is an automated alert from your printer monitoring script.
 """
             send_email_alert(subject, body)
 
+    def get_status(self) -> PrinterStatus:
+        """Get current printer status using available methods."""
+        status = PrinterStatus()
+
+        # Try SNMP first (for network printers)
+        if SNMP_AVAILABLE and PRINTER_IP:
+            status = get_printer_status_snmp(PRINTER_IP, SNMP_COMMUNITY)
+            if not status.error:
+                return status
+            logger.warning(f"SNMP failed: {status.error}")
+
+        # Fall back to Windows API
+        if WIN32_AVAILABLE:
+            status = get_printer_status_win32(PRINTER_NAME)
+
+        return status
+
+    def display_current_status(self):
+        """Display current printer status immediately."""
+        print("\n" + "=" * 50)
+        print("CURRENT PRINTER STATUS")
+        print("=" * 50)
+
+        status = self.get_status()
+
+        if status.error:
+            print(f"Error: {status.error}")
+        else:
+            print(f"Printer:          {PRINTER_NAME}")
+            print(f"Status:           {status.status}")
+            print(f"Paper Remaining:  {status.paper_remaining if status.paper_remaining is not None else 'N/A'}")
+            print(f"Ink Remaining:    {str(status.ink_remaining) + '%' if status.ink_remaining is not None else 'N/A'}")
+            print(f"Prints Remaining: {status.prints_remaining if status.prints_remaining is not None else 'N/A'}")
+
+        print("=" * 50)
+
+        # Check thresholds
+        if status.paper_remaining is not None and status.paper_remaining <= PAPER_THRESHOLD:
+            print(f"WARNING: Paper is LOW! ({status.paper_remaining} <= {PAPER_THRESHOLD})")
+        if status.ink_remaining is not None and status.ink_remaining <= INK_THRESHOLD:
+            print(f"WARNING: Ink is LOW! ({status.ink_remaining}% <= {INK_THRESHOLD}%)")
+
+        print()
+        return status
+
     def run(self):
         """Main monitoring loop."""
         logger.info("=" * 50)
@@ -312,18 +357,18 @@ This is an automated alert from your printer monitoring script.
         logger.info(f"Ink threshold: {INK_THRESHOLD}%")
         logger.info("=" * 50)
 
+        # Show current status immediately on startup
+        status = self.display_current_status()
+        self.check_and_alert(status)
+
+        print(f"Monitoring started. Checking every {CHECK_INTERVAL_SECONDS} seconds...")
+        print("Press Ctrl+C to stop.\n")
+
         while True:
             try:
-                # Try SNMP first (for network printers)
-                if SNMP_AVAILABLE and PRINTER_IP:
-                    status = get_printer_status_snmp(PRINTER_IP, SNMP_COMMUNITY)
-                    if status.error:
-                        logger.warning(f"SNMP failed: {status.error}")
+                time.sleep(CHECK_INTERVAL_SECONDS)
 
-                # Fall back to Windows API
-                if WIN32_AVAILABLE and (not SNMP_AVAILABLE or status.error):
-                    status = get_printer_status_win32(PRINTER_NAME)
-
+                status = self.get_status()
                 if status.error:
                     logger.error(f"Could not get printer status: {status.error}")
                 else:
@@ -332,8 +377,6 @@ This is an automated alert from your printer monitoring script.
             except Exception as e:
                 logger.error(f"Error in monitoring loop: {e}")
 
-            time.sleep(CHECK_INTERVAL_SECONDS)
-
 
 # =============================================================================
 # ENTRY POINT
@@ -341,21 +384,10 @@ This is an automated alert from your printer monitoring script.
 
 if __name__ == "__main__":
     print("""
-    ============================================
-    HiTi P525 Printer Monitor
-    ============================================
-
-    Before running, please configure:
-    1. EMAIL_SENDER - Your Gmail address
-    2. EMAIL_PASSWORD - Your Gmail App Password
-    3. PRINTER_NAME - Printer name in Windows
-    4. PRINTER_IP - If network connected
-
-    Required packages:
-        pip install pysnmp pywin32
-
-    Press Ctrl+C to stop monitoring.
-    ============================================
+============================================
+HiTi P525 Printer Monitor
+============================================
+Fetching current printer status...
     """)
 
     monitor = PrinterMonitor()
