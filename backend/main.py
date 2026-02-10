@@ -57,56 +57,73 @@ client = OpenAI(
 
 options = {
     "trophy": {
-        "prompt": """
-        Generate a photorealistic, high-resolution vertical portrait of the person from the provided input image. 
-        CRITICAL INSTRUCTION - POSE CHANGE Modify the subject's pose: You must ignore whatever pose the person is doing and substitute it with the following new action. New Action: The subject must be holding the large golden trophy cup up with both hands, exactly as shown in the Generation Reference Images. The hands should grasp the base or stem of the trophy, lifting it in a celebratory manner. 
-        Subject Consistency (From Input Image): Identity: Strictly preserve the exact facial features, do not alter any facial features, resulting image facial features must match exactly with the input image. 
-        Clothing: Do not alter the clothing of the person in the input image, it must remain unchanged. 
-        Trophy & Reference Adherence: Trophy Design: The trophy must be the exact golden cup visible in the Generation Reference Images. It is a large, ornate gold cup with a lid and two prominent looped handles. Ensure the scale creates a sense of weight and prestige. 
-        Style & Lighting: Mimic the lighting and atmosphere of the Generation Reference Images. The scene is set at night under bright stadium ﬂoodlights. 
-        Setting & Location: The dirt track of a professional racecourse (King Abdulaziz Racecourse style). Background: Blurred stadium lights, dark night sky, and distant green railing/crowd elements, creating a cinematic depth of ﬁeld. 
-        Summary: Subject Face/Clothes = From Input Image. Pose/Trophy/Lighting = From Generation Reference Images.
-        """,
+        "prompt": """Image 1 is a portrait photo of a real person. Image 2 is a reference showing the trophy, pose, and scene.
+
+SCENE: Night-time celebration on the dirt track of King Abdulaziz Racecourse. Dark sky, bright white stadium floodlights casting dramatic top-down illumination. Blurred stadium lights and crowd creating cinematic bokeh. Shot on 85mm lens, f/2.0, fast shutter speed.
+
+SUBJECT: Place the person from Image 1 into the scene, holding the golden trophy from Image 2 overhead with both hands in a celebratory pose. Vertical 3/4 portrait from waist up. Face must be well-lit by floodlights, clearly visible.
+
+IDENTITY: Preserve the person's exact face, identity, skin tone, facial hair, hair, expression, and all distinguishing features from Image 1. Do not alter, smooth, or stylize the face in any way.
+
+CLOTHING: Keep the person's exact clothing from Image 1 unchanged.
+
+TROPHY: Replicate the exact golden cup from Image 2 with realistic scale, golden reflections from floodlights on its surface.
+
+MODESTY: If the subject is female, ensure Islamic modesty standards — clothing must fully cover arms, legs, and chest with zero cleavage visible. If the original clothing in Image 1 does not meet this, extend or adjust garments (e.g. raise neckline, extend sleeves) to provide full modest coverage while keeping the same style, color, and fabric. A hijab or headscarf is acceptable if already present in Image 1, but do not add one if not already worn.
+
+CHANGE ONLY the background and pose. Keep the face, identity, and clothing exactly as they appear in Image 1. No watermarks, text, logos, sunglasses, hats, or face coverings. No deformed hands.""",
         "reference_images": ["./references/trophy.png"]
     },
     "horse": {
-        "prompt": """
-        Photorealistic premium sports photograph.
+        "prompt": """Image 1 is a portrait photo of a real person. Image 2 is a reference showing the jockey outfit, horse, and racing scene.
 
-        PRIMARY GOAL (must prioritize): The rider is the SAME PERSON as the input portrait. Preserve the subject’s exact facial identity: facial proportions, eye shape/spacing, eyebrows, nose, lips, beard/mustache shape, skin tone. Do not stylize the face. Keep natural skin texture.
-        Insure that the face is extactly the same as the input image, no alterations, no changes, it must remain the same exact face as the input.
-        SCENE: The subject is racing as a professional jockey in the Saudi Cup at King Abdulaziz Racecourse at night under powerful stadium floodlights. Dynamic action, dirt flying from hooves, other horses slightly behind, background grandstands with motion blur to show speed.
-        COMPOSITION (identity lock): Tight 3/4 close-up action framing from the chest up while riding (telephoto sports shot). The subject’s face must be clearly visible, sharp, and well-lit. No motion blur on the face. Helmet allowed but MUST NOT cover key facial features. Keep visor up. NO goggles. No face coverings. Do not obscure the face with shadows; ensure floodlights illuminate the face.
-        WARDROBE (full replacement): Completely replace the original clothing with professional jockey racing silks matching Saudi Cup style. Outfit must match the outfit in the reference image exactly.
-        ACTION / HORSE: Subject is in a realistic racing crouch, hands on reins, riding a galloping thoroughbred racehorse. Horse anatomy must be realistic and proportionate. Add kicked-up dirt and subtle particles.
-        LIGHTING / CAMERA: Nighttime cinematic high-contrast stadium lighting, realistic reflections on helmet and satin silks. Shallow depth of field. Sports photography look (telephoto, fast shutter). Sharp subject, blurred background only.
-        QUALITY RULES (avoid common failures): No face morphing, no “generic” face, no extra fingers, no warped hands, no deformed horse legs, no melted logos, no unreadable text, no duplicated limbs, no plastic skin, no painterly or CGI look.
-        """,
+SCENE: Night-time horse race at King Abdulaziz Racecourse during the Saudi Cup. Dark sky, powerful white stadium floodlights. Background grandstands with spectators in motion blur. Other racehorses slightly behind. Kicked-up dirt and dust clouds. Shot on 200mm telephoto, f/2.8, 1/2000s shutter freezing the rider while blurring the background.
+
+COMPOSITION: Tight 3/4 action framing from chest up while riding. The face must be the sharpest element — well-lit by floodlights, zero motion blur. Camera angle slightly below eye level for heroic perspective.
+
+IDENTITY: Preserve the person's exact face, identity, skin tone, facial hair, hair, expression, and all distinguishing features from Image 1. Do not alter, smooth, or stylize the face in any way.
+
+WARDROBE: Change only the clothing — replace with professional jockey racing silks matching Image 2 exactly (same colors, patterns, design). Jockey helmet must not obscure the face: visor up, no goggles, full face exposed and well-lit.
+
+HORSE & ACTION: Realistic racing crouch, gloved hands gripping reins, galloping thoroughbred at full speed. Anatomically correct horse with proper galloping stride. Kicked-up dirt and motion particles.
+
+MODESTY: If the subject is female, ensure Islamic modesty standards — racing silks must fully cover arms, legs, and chest with zero cleavage visible and no exposed skin. Adjust the jockey outfit to provide full modest coverage while keeping the same colors and design from Image 2. A hijab or headscarf under the helmet is acceptable if already present in Image 1, but do not add one if not already worn.
+
+CHANGE ONLY the background, clothing, and pose. Keep the face and identity exactly as they appear in Image 1. No face coverings, goggles, or visors over the face. No deformed hands or horse legs. No watermarks or text.""",
         "reference_images": ["./references/horse.png"]
     },
     "card": {
-        "prompt": """
-        Transform the subject from the input image into a luxury fashion illustration on a physical card, following the artistic style of the reference image but incorporating speciﬁc branding changes. 
-        1. Subject & Pose (From Input Image):  Illustrate the person in the input image. Maintain whatever pose is in the input image. 
-        Artistic Abstraction: As per the reference style, the face must remain completely blank/faceless (no eyes, nose, or mouth), drawing only the jawline and head shape. 
-        2. Artistic Style (From Reference Image): Mimic the mixed-media fashion croquis style: watercolor washes, Copic marker shading, and pencil outlines. The illustration should appear drawn on textured oﬀ-white/cream paper.   
-        3. CRITICAL FEEDBACK MODIFICATIONS (Must Implement): The Logo: Insure the logo is in the top right corner of the card in the output image, exactly the same as the reference image.
-        The Background: Place the card against a background representing The Saudi Cup (e.g., the architecture of the King Abdulaziz Racetrack, or a luxury equestrian atmosphere associated with the event). The background should be elegant   and blurred to keep focus on the card. 
-        Summary of Output: A vertical image of a hand-drawn fashion sketch of a faceless person on a card, featuring the Saudi Cup logo, set against a Saudi Cup themed background.
+        "prompt": """Image 1 is a photo of a real person. Image 2 is a reference card showing the artistic style, layout, and logo placement.
 
-        """,
+ARTWORK STYLE: Create a luxury fashion illustration on a physical card, using the mixed-media fashion croquis style from Image 2: watercolor washes, Copic marker shading, and pencil outlines. The illustration should appear hand-drawn on textured off-white/cream paper.
+
+SUBJECT & POSE: Illustrate the person from Image 1, maintaining their pose from the input photo. CRITICAL: The face must remain completely blank/faceless as per the reference style - no eyes, nose, or mouth. Draw only the jawline and head shape. Preserve the subject's body proportions, clothing silhouette, and overall appearance from Image 1.
+
+LOGO & BRANDING: Place the Saudi Cup logo in the top right corner of the card, exactly matching the logo position, size, and design from Image 2. The logo must be crisp and legible.
+
+BACKGROUND: Place the card against a background representing The Saudi Cup - the architecture of King Abdulaziz Racetrack or a luxury equestrian atmosphere. The background should be elegant and blurred to keep focus on the card.
+
+OUTPUT: A vertical image of a hand-drawn fashion sketch of a faceless person on a card, featuring the Saudi Cup logo, set against a Saudi Cup themed background.
+
+MODESTY: If the subject is female, ensure Islamic modesty standards in the illustrated clothing — garments must fully cover arms, legs, and chest with zero cleavage visible. Adjust the fashion sketch to provide full modest coverage while keeping the same style and silhouette. A hijab or headscarf is acceptable if already present in Image 1, but do not add one if not already worn.
+
+DO NOT: Add facial features (eyes, nose, mouth). Change the logo design or placement. Add watermarks or extra text.""",
         "reference_images": ["./references/card.png"]
     },
     "portrait": {
-        "prompt": """
-        Create a high-quality, hand-drawn oil painting portrait of the person from the input image. 
-        1. Subject & Likeness (From Input Image): Portray the person in the input image, do not alter any features. Maintain the poses from the input photo. 
-        CRITICAL CHANGE: Render a complete, detailed portrait of the persons face and expression as if a live artist were painting him in a studio. 
-        2. Art Style (Oil Painting): Adopt a classic oil painting style: Use visible brushstrokes, rich textures, and deep colors to mimic the look of a ﬁne art piece created on canvas. The lighting should be dramatic and elegant. 
-        3. Background & Composition: The image should be a full-frame painting.
-        Setting: Place the subject against a sophisticated, blurred background representing the atmosphere of The Saudi Cup (King Abdulaziz Racetrack). Use warm, architectural tones or equestrian hints in the background to establish the context without distracting from the portrait. 
+        "prompt": """Image 1 is a portrait photo of a real person. Image 2 is a reference showing the oil painting style and composition.
 
-        """,
+STYLE: Apply the oil painting style from Image 2 — visible brushstrokes, rich textures, deep colors on canvas. Dramatic chiaroscuro lighting. Canvas texture visible through the paint. The look of a commissioned fine art portrait by a master painter.
+
+SUBJECT: Paint the person from Image 1 as a detailed portrait. Preserve the person's exact face, identity, skin tone, facial hair, hair, expression, pose, and all distinguishing features from Image 1. The portrait must be unmistakably recognizable as the same person.
+
+COMPOSITION: Full-frame oil painting portrait. Maintain the framing and pose from Image 1.
+
+BACKGROUND: Softly blurred background representing The Saudi Cup at King Abdulaziz Racetrack — warm golden and amber architectural tones with subtle equestrian hints.
+
+MODESTY: If the subject is female, ensure Islamic modesty standards — clothing in the portrait must fully cover arms, legs, and chest with zero cleavage visible. If the original clothing in Image 1 does not meet this, extend or adjust garments (e.g. raise neckline, extend sleeves) to provide full modest coverage while keeping the same style and color. A hijab or headscarf is acceptable if already present in Image 1, but do not add one if not already worn.
+
+Change only the visual medium (photo to oil painting) and background. Keep the face, identity, and likeness exactly as they appear in Image 1. No watermarks or text.""",
         "reference_images": ["./references/portrait.png"]
     }
 }
@@ -157,6 +174,7 @@ async def generate_stream(
                 image=image_list,
                 prompt=prompt,
                 input_fidelity="high",
+                quality="high",
                 size="1024x1536",
                 output_format="jpeg",
                 partial_images=3,
@@ -370,4 +388,3 @@ if sys.platform == "win32":
 
 if __name__ == "__main__":
     uvicorn.run(app, host="0.0.0.0", port=8000)
-
