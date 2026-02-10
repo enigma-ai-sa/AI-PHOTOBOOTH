@@ -22,7 +22,7 @@ if sys.platform == "win32":
     from PIL import ImageWin
 
 # GLOBAL VARIABLES
-QRCODE = True
+QRCODE = False
 
 load_dotenv()
 
@@ -56,33 +56,9 @@ client = OpenAI(
 options = {
     "ghibli": {
         "prompt": """
-        Create a full-body shot of the person(s) in the provided photo in a semi-realisticStudio Ghibli style.
-        Set the background to AlUla mountains which is provided as a reference image, it should be night time, with stars visible.
-        """,
-        "reference_images": ["./references/alula_mountains.png"]
-    },
-    "studio": {
-        "prompt": """
-        Take the person(s) from the provided image and generate a Studio Portrait a blurred background of sparkles.
-        Ensure the person(s)' face and features remain completely unchanged. Keep the face untouched, only blur the background.
+        Create a full-body shot of the person(s) in the provided photo in a semi-realistic Studio Ghibli style.
         """
     },
-    "2026": {
-        "prompt": """
-        Take the person(s) from the provided image and generate a hyper-realistic image of them with
-        the background displays a spectacular New Year's Eve atmosphere with a drone light show in the night sky explicitly spelling "2026", accompanied by elegant gold and silver fireworks. The scene is illuminated by the festival lights and starlight.
-        Ensure the person(s)' face and features remain completely unchanged. Keep the face untouched.
-        """,
-        "reference_images": ["./references/alula_mountains.png"]
-    },
-    "HNY": {
-        "prompt": """
-        Take the person(s) from the provided image and generate a hyper-realistic image of them with
-        the background displays a spectacular New Year's Eve atmosphere with a drone light show in the night sky explicitly spelling "Happy New Year from AlUla", accompanied by elegant gold and silver fireworks. The scene is illuminated by the festival lights and starlight.
-        Ensure the person(s)' face and features remain completely unchanged. Keep the face untouched.
-        """,
-        "reference_images": ["./references/alula_mountains.png"]
-    }
 }
 
 def load_reference_images():
@@ -342,5 +318,5 @@ if sys.platform == "win32":
             pass
 
 if __name__ == "__main__":
-    uvicorn.run(app, host="0.0.0.0", port=8000)
+    uvicorn.run(app, host="0.0.0.0", port=8001)
 

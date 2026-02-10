@@ -5,10 +5,11 @@ import { useAspectRatio } from "@/hooks/useAspectRatio";
 import { useImageStream } from "@/hooks/useImageStream";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
-import { IoCheckmarkCircleOutline, IoRefreshOutline } from "react-icons/io5";
+import { IoPrintOutline, IoRefreshOutline } from "react-icons/io5";
 
 export default function Processing() {
   const [capturedImage, setCapturedImage] = useState<string | null>(null);
+  const [isPrinting, setIsPrinting] = useState(false);
   const hasStartedGenerationRef = useRef(false);
   const router = useRouter();
   const { tailwindClass } = useAspectRatio();
@@ -65,7 +66,18 @@ export default function Processing() {
     router.push("/select-style");
   };
 
-  const handleDone = () => {
+  const handlePrint = async () => {
+    if (!currentImage || isPrinting) return;
+    setIsPrinting(true);
+    try {
+      await fetch("/api/print", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ image: currentImage }),
+      });
+    } catch (err) {
+      console.error("Print request failed:", err);
+    }
     router.push("/thank-you");
   };
 
@@ -155,13 +167,14 @@ export default function Processing() {
                     Retake
                   </Button>
                   <Button
-                    onClick={handleDone}
+                    onClick={handlePrint}
                     variant="primary"
                     size="large"
                     className="gap-4"
+                    disabled={isPrinting}
                   >
-                    <IoCheckmarkCircleOutline />
-                    Done
+                    <IoPrintOutline />
+                    {isPrinting ? "Printing..." : "Print"}
                   </Button>
                 </div>
               </div>
