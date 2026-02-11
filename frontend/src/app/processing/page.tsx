@@ -171,7 +171,7 @@ export default function Processing() {
                       <img
                         src={qrCode}
                         alt="QR Code to download your photo"
-                        className="w-120 h-120"
+                        className="w-80 h-80"
                       />
                     </div>
                   </div>
