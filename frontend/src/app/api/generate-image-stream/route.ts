@@ -1,5 +1,7 @@
 // src/app/api/generate-image-stream/route.ts
 import { NextRequest } from "next/server";
+import { writeFile, mkdir } from "fs/promises";
+import path from "path";
 
 const BACKEND_URL =
   process.env.NEXT_PUBLIC_BACKEND_URL || "http://localhost:8000";
@@ -29,6 +31,22 @@ export async function POST(request: NextRequest) {
     // Convert base64 to blob for multipart/form-data
     const base64Data = image.replace(/^data:image\/\w+;base64,/, "");
     const binaryData = Buffer.from(base64Data, "base64");
+
+    // Save image to disk
+    const imageFormat = image.match(/^data:(image\/\w+);base64,/)?.[1] || "image/png";
+    const extension = imageFormat.split("/")[1] || "png";
+    const timestamp = new Date().toISOString().replace(/[:.]/g, "-");
+    const filename = `${timestamp}_${option}.${extension}`;
+
+    const saveDir = path.join(process.cwd(), "saved-images");
+    const filePath = path.join(saveDir, filename);
+
+    // Ensure directory exists and save the image
+    await mkdir(saveDir, { recursive: true });
+    await writeFile(filePath, binaryData);
+
+    console.log(`[Stream] Image saved: ${filePath}`);
+
     const blob = new Blob([binaryData], { type: "image/png" });
 
     // Create FormData with the image file and option
