@@ -1,14 +1,22 @@
 "use client";
 
 import Button from "@/components/UI/Button";
+import PrintCopiesModal from "@/components/PrintCopiesModal";
 import { useAspectRatio } from "@/hooks/useAspectRatio";
 import { useImageStream } from "@/hooks/useImageStream";
+import { SHOW_PRINT_BUTTON } from "@/data/aspectRatioConfig";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
-import { IoCheckmarkCircleOutline, IoRefreshOutline } from "react-icons/io5";
+import {
+  IoCheckmarkCircleOutline,
+  IoPrint,
+  IoRefreshOutline,
+} from "react-icons/io5";
 
 export default function Processing() {
   const [capturedImage, setCapturedImage] = useState<string | null>(null);
+  const [showPrintModal, setShowPrintModal] = useState(false);
+  const [printCopies, setPrintCopies] = useState(1);
   const hasStartedGenerationRef = useRef(false);
   const router = useRouter();
   const { tailwindClass } = useAspectRatio();
@@ -67,6 +75,45 @@ export default function Processing() {
 
   const handleDone = () => {
     router.push("/thank-you");
+  };
+
+  const handlePrint = () => {
+    if (!currentImage) return;
+    setShowPrintModal(true);
+  };
+
+  const handleConfirmPrint = async () => {
+    if (!currentImage) return;
+    try {
+      const response = await fetch(currentImage);
+      const blob = await response.blob();
+
+      for (let i = 0; i < printCopies; i++) {
+        const formData = new FormData();
+        formData.append("file", blob, "generated_image.png");
+        await fetch("http://127.0.0.1:8000/print", {
+          method: "POST",
+          body: formData,
+        });
+      }
+    } catch (error) {
+      console.error("Print failed:", error);
+    }
+    setShowPrintModal(false);
+    setPrintCopies(1);
+  };
+
+  const handleIncrementCopies = () => {
+    setPrintCopies((prev) => Math.min(prev + 1, 10));
+  };
+
+  const handleDecrementCopies = () => {
+    setPrintCopies((prev) => Math.max(prev - 1, 1));
+  };
+
+  const handleCancelPrint = () => {
+    setShowPrintModal(false);
+    setPrintCopies(1);
   };
 
   // Determine loading text based on state
@@ -154,15 +201,27 @@ export default function Processing() {
                     <IoRefreshOutline />
                     Retake
                   </Button>
-                  <Button
-                    onClick={handleDone}
-                    variant="primary"
-                    size="large"
-                    className="gap-4"
-                  >
-                    <IoCheckmarkCircleOutline />
-                    Done
-                  </Button>
+                  {SHOW_PRINT_BUTTON ? (
+                    <Button
+                      onClick={handlePrint}
+                      variant="primary"
+                      size="large"
+                      className="gap-4"
+                    >
+                      <IoPrint />
+                      Print Photo
+                    </Button>
+                  ) : (
+                    <Button
+                      onClick={handleDone}
+                      variant="primary"
+                      size="large"
+                      className="gap-4"
+                    >
+                      <IoCheckmarkCircleOutline />
+                      Done
+                    </Button>
+                  )}
                 </div>
               </div>
             </div>
@@ -231,6 +290,14 @@ export default function Processing() {
           )}
         </div>
       </div>
+      <PrintCopiesModal
+        isOpen={showPrintModal}
+        copies={printCopies}
+        onIncrement={handleIncrementCopies}
+        onDecrement={handleDecrementCopies}
+        onConfirm={handleConfirmPrint}
+        onCancel={handleCancelPrint}
+      />
     </div>
   );
 }

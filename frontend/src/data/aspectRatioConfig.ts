@@ -19,37 +19,37 @@ export const ASPECT_RATIOS: Record<AspectRatioKey, AspectRatioConfig> = {
     key: "16:9",
     label: "Widescreen",
     numericRatio: 16 / 9,
-    tailwindClass: "[16/9]",
+    tailwindClass: "aspect-[16/9]",
   },
   "4:3": {
     key: "4:3",
     label: "Standard",
     numericRatio: 4 / 3,
-    tailwindClass: "[4/3]",
+    tailwindClass: "aspect-[4/3]",
   },
   "3:2": {
     key: "3:2",
     label: "Classic",
     numericRatio: 3 / 2,
-    tailwindClass: "[3/2]",
+    tailwindClass: "aspect-[3/2]",
   },
   "1:1": {
     key: "1:1",
     label: "Square",
     numericRatio: 1,
-    tailwindClass: "[1/1]",
+    tailwindClass: "aspect-square",
   },
   "9:16": {
     key: "9:16",
     label: "Portrait",
     numericRatio: 9 / 16,
-    tailwindClass: "[9/16]",
+    tailwindClass: "aspect-[9/16]",
   },
   "2:3": {
     key: "2:3",
     label: "Portrait 2:3",
     numericRatio: 2 / 3,
-    tailwindClass: "[2/3]",
+    tailwindClass: "aspect-[2/3]",
   },
   "full-height": {
     key: "full-height",
@@ -62,13 +62,14 @@ export const ASPECT_RATIOS: Record<AspectRatioKey, AspectRatioConfig> = {
 // ====== CHANGE THIS TO SWITCH ASPECT RATIO ======
 export const CURRENT_ASPECT_RATIO: AspectRatioKey = "3:2";
 
+// ====== TOGGLE PRINT VS DONE BUTTON ======
+export const SHOW_PRINT_BUTTON = false; // Set to false to show "Done" button, true to show "Print"
+
 // Helper functions
 export const getAspectRatioConfig = () => ASPECT_RATIOS[CURRENT_ASPECT_RATIO];
 export const getAspectTailwindClass = () => {
   const config = getAspectRatioConfig();
-  return config.tailwindClass
-    ? `aspect-${config.tailwindClass}`
-    : "h-full !w-full";
+  return config.tailwindClass ?? "h-full !w-full";
 };
 export const getVideoAspectRatio = () =>
   getAspectRatioConfig().numericRatio ?? undefined;
